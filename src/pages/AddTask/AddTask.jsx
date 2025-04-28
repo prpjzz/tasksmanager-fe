@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, useReducer } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     TextField,
     Button,
@@ -9,38 +9,27 @@ import {
     RadioGroup,
     FormControlLabel,
     Radio,
-    Divider
+    Divider,
+    Alert
 } from '@mui/material';
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
 import Selection from '../../components/Form/Selection';
 import * as taskServices from '../../services/taskServices'; // Import task service
-// Khai báo reducer
-const initialState = {
-    taskName: '',
-    taskDescription: '',
-};
 
-function formReducer(state, action) {
-    switch (action.type) {
-        case 'SET_TASK_NAME':
-        return { ...state, taskName: action.payload };
-        case 'SET_TASK_DESCRIPTION':
-        return { ...state, taskDescription: action.payload };
-        default:
-        return state;
-    }
-}
 const AddTask = () => {
     const [dateTimeRange, setDateTimeRange] = useState({
         start: new Date(),
         end: new Date(),
         mode: 'datetime',
     });
+    const [taskName, setTaskName] = useState('');
+    const [taskDescription, setTaskDescription] = useState('');
     const [mainTasks, setMainTasks] = useState([]);
     const [status, setStatus] = useState('not_started');
     const [priority, setPriority] = useState('low');
     const [mainTask, setMainTask] = useState('');
     const [taskType, setTaskType] = useState('main');
+    const [response, setRespone] = useState(null);
     
     useEffect(() => {
         const fetchMainTasks = async () => {
@@ -49,9 +38,10 @@ const AddTask = () => {
                 if (response.data && response.data.length > 0) {
                     const activeTasks = response.data.filter(task => {
                         const currentDate = new Date();
-                        return new Date(task.start_date) <= currentDate && new Date(task.end_date) >= currentDate;
+                        return new Date(task.end_date) >= currentDate;
                     });
                     setMainTasks(activeTasks);
+                    console.log(activeTasks);
                 }
             } catch (error) {
                 console.error('Error fetching main tasks:', error);
@@ -59,18 +49,6 @@ const AddTask = () => {
         };
         fetchMainTasks();
     }, []);
-
-    const [state, dispatch] = useReducer(formReducer, initialState);
-
-    // Hàm để dispatch action cập nhật taskName
-    const handleTaskNameChange = (e) => {
-        dispatch({ type: 'SET_TASK_NAME', payload: e.target.value });
-    };
-
-    // Hàm để dispatch action cập nhật taskDescription
-    const handleTaskDescriptionChange = (e) => {
-        dispatch({ type: 'SET_TASK_DESCRIPTION', payload: e.target.value });
-    };
     
     const menuitems = useMemo(() => 
         mainTasks.map(task => ({ value: task.id, label: task.task_name })),
@@ -101,7 +79,6 @@ const AddTask = () => {
         setMainTask(event.target.value);
 
         const selectedTask = mainTasks.find((task) => task.id === event.target.value);
-        console.log(selectedTask);
         setDateTimeRange((prev) => {
             // Chỉ cập nhật nếu giá trị mới khác với giá trị hiện tại
             if (
@@ -120,25 +97,18 @@ const AddTask = () => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!state.taskName || !state.taskDescription) {
-            alert('Vui lòng điền tên và mô tả cho task!');
-            return;
-        }
-        
-        if (!dateTimeRange.start || !dateTimeRange.end) {
-            alert('Vui lòng chọn khoảng thời gian cho task!');
-            return;
-        }
-        
+
         if (mainTask !== '') {
             const selectedMainTask = mainTasks.find(task => task.id === mainTask);
+            if (!selectedMainTask) return;
+
             const taskData = {
                 ...selectedMainTask,
                 subtasks: [
                     ...selectedMainTask.subtasks,
                     {
-                        task_name: state.taskName,
-                        task_description: state.taskDescription,
+                        task_name: taskName,
+                        task_description: taskDescription,
                         status,
                         priority,
                         start_date: dateTimeRange.start,
@@ -149,8 +119,8 @@ const AddTask = () => {
             console.log(taskData);
         } else {
             const taskData = {
-                task_name: state.taskName,
-                task_description: state.taskDescription,
+                task_name: taskName,
+                task_description: taskDescription,
                 status,
                 priority,
                 start_date: dateTimeRange.start,
@@ -162,10 +132,22 @@ const AddTask = () => {
             try {
                 const response = await taskServices.createTask(taskData);
                 console.log('Task created successfully:', response.data);
+                setRespone({
+                    status: "success",
+                    message: "Thêm công việc thành công"
+                });
             } catch (error) {
                 console.error('Error creating task:', error);
+                setRespone({
+                    status: "error",
+                    message: "Thêm công việc thất bại, có lỗi xảy ra. Vui lòng thử lại sau"
+                });
             }
         }
+
+        setTaskName('');
+        setTaskDescription('');
+        setMainTask('');
     };
 
     return (
@@ -175,8 +157,8 @@ const AddTask = () => {
                 <TextField
                     label="Tên Task"
                     name="taskName"
-                    value={state.taskName}
-                    onChange={handleTaskNameChange}
+                    value={taskName}
+                    onChange={(e) => setTaskName(e.target.value)}
                     fullWidth
                     required
                     margin="normal"
@@ -185,15 +167,15 @@ const AddTask = () => {
                 <TextField
                     label="Mô tả"
                     name="description"
-                    value={state.taskDescription}
-                    onChange={handleTaskDescriptionChange}
+                    value={taskDescription}
+                    onChange={(e) => setTaskDescription(e.target.value)}
                     fullWidth
                     multiline
                     rows={4}
                     margin="normal"
                 />
 
-                {/* <Selection
+                 <Selection
                     title="Trạng thái"
                     name="status"
                     value={status}
@@ -215,17 +197,21 @@ const AddTask = () => {
                         { value: 'medium', label: 'Trung bình' },
                         { value: 'high', label: 'Cao' },
                     ], [])}
-                /> */}
-        
-                {/* <FormControl component="fieldset">
-                    <FormLabel component="legend">Chọn loại task</FormLabel>
-                    <RadioGroup row aria-label="taskType" name="taskType" value={taskType} onChange={handleTaskTypeChange}>
-                        <FormControlLabel value="main" control={<Radio />} label="Task chính" />
-                        <FormControlLabel value="sub" control={<Radio />} label="Task phụ" />
-                    </RadioGroup>
-                </FormControl> */}
+                /> 
 
-                {/* {taskType === 'sub' && (
+                {mainTasks && mainTasks.length > 0 ? (
+                    <FormControl component="fieldset">
+                        <FormLabel component="legend">Chọn loại task</FormLabel>
+                        <RadioGroup row aria-label="taskType" name="taskType" value={taskType} onChange={handleTaskTypeChange}>
+                            <FormControlLabel value="main" control={<Radio />} label="Task chính" />
+                            <FormControlLabel value="sub" control={<Radio />} label="Task phụ" />
+                        </RadioGroup>
+                    </FormControl> 
+                ): (
+                    <FormLabel component="legend">Loại task: Main task</FormLabel>
+                )}
+
+                 {taskType === 'sub' && (
                     <Selection
                         title="Chọn task chính"
                         name="mainTask"
@@ -233,21 +219,38 @@ const AddTask = () => {
                         onChange={handleMainTaskChange}
                         menuitems={menuitems}
                     />
-                )} */}
+                )} 
 
                 <Divider sx={{ my: 2 }} />
 
-                {/* <FormControl fullWidth margin="normal">
+                 <FormControl fullWidth margin="normal">
                     <DateTimeOrTimeRangePicker
                         value={dateTimeRange}
                         onChange={handleDateTimeChange}
                     />
-                </FormControl> */}
+                </FormControl> 
 
                 <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                     Thêm Task
                 </Button>
             </form>
+
+            {response && (
+                <Alert 
+                    severity={response.success}
+                    onClose={() => setRespone(null)}
+                    sx={{
+                        position: "absolute",
+                        top: "20px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "300px",
+                        zIndex: 99999,
+                    }}
+                >
+                    {response.message}
+                </Alert>
+            )}
         </Box>
     );                    
 }
