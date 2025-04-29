@@ -16,8 +16,10 @@ import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicke
 import Selection from '../../components/Form/Selection';
 import ListTasks from '../../components/ListTasks';
 import * as taskServices from '../../services/taskServices';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AddTask = () => {
+    const { user } = useAuth();
     const [dateTimeRange, setDateTimeRange] = useState({
         start: new Date(),
         end: new Date(),
@@ -36,9 +38,9 @@ const AddTask = () => {
     useEffect(() => {
         const fetchMainTasks = async () => {
             try {
-                const response = await taskServices.getAllTasks();
-                if (response.data && response.data.length > 0) {
-                    const activeTasks = response.data.filter(task => {
+                const response = await taskServices.getTasksByUserId(user.id);
+                if (response && response.length > 0) {
+                    const activeTasks = response.filter(task => {
                         const currentDate = new Date();
                         return new Date(task.end_date) >= currentDate;
                     });
@@ -62,7 +64,7 @@ const AddTask = () => {
             }
         };
         fetchMainTasks();
-    }, []);
+    }, [user.id]);
     
     const menuitems = useMemo(() => 
         mainTasks.map(task => ({ value: task.id, label: task.task_name })),
@@ -132,7 +134,6 @@ const AddTask = () => {
                     }
                 ],
             };
-            console.log(taskData);
             setMainTasks(prev => prev.map(task => task.id === mainTask ? taskData : task));
             setSubTasks(prev => {
                 return [
@@ -152,6 +153,7 @@ const AddTask = () => {
             })
         } else {
             const taskData = {
+                userid: user.id,
                 task_name: taskName,
                 task_description: taskDescription,
                 status,
@@ -162,8 +164,6 @@ const AddTask = () => {
                 created_at: new Date(),
                 updated_at: new Date(),
             };
-            console.log(taskData);
-
             try {
                 const response = await taskServices.createTask(taskData);
                 console.log('Task created successfully:', response.data);
