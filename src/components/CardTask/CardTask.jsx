@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 const CardTask = ({ task }) => {
-    console.log("CardTask component rendered with task:", task);
     const [statusColors, setStatusColors] = useState({});
     
     useEffect(() => {
@@ -40,6 +39,21 @@ const CardTask = ({ task }) => {
                 <Typography variant="h6">
                     {task.task_name}
                 </Typography>
+                {task.maintask ? (
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                    >
+                        Loại task: Task phụ của task {task.maintask}
+                    </Typography>
+                ) : (
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                    >
+                        Loại task: Task chính
+                    </Typography>
+                )}
                 <Typography
                     variant="body2"
                     color="text.secondary"

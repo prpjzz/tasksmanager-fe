@@ -8,6 +8,8 @@
       "end_date": "2025-04-02",
       "status": "In Progress",
       "priority": "High",
+      "created_at": "2025-04-01T00:00:00Z",
+      "updated_at": "2025-04-01T00:00:00Z",
       "subtasks": [
         {
           "id": 1,
@@ -16,7 +18,9 @@
           "start_date": "2025-04-01",
           "end_date": "2025-04-02",
           "status": "In Progress",
-          "priority": "High"
+          "priority": "High",
+          "created_at": "2025-04-01T00:00:00Z",
+          "updated_at": "2025-04-01T00:00:00Z"
         },
         {
           "id": 2,
@@ -25,7 +29,9 @@
           "start_date": "2025-04-03",
           "end_date": "2025-04-04",
           "status": "Not Started",
-          "priority": "Medium"
+          "priority": "Medium",
+          "created_at": "2025-04-03T00:00:00Z",
+          "updated_at": "2025-04-03T00:00:00Z"
         },
         {
           "id": 3,
@@ -34,7 +40,9 @@
           "start_date": "2025-04-05",
           "end_date": "2025-04-06",
           "status": "Completed",
-          "priority": "Low"
+          "priority": "Low",
+          "created_at": "2025-04-05T00:00:00Z",
+          "updated_at": "2025-04-05T00:00:00Z"
         }
       ]
     },
@@ -46,6 +54,8 @@
       "end_date": "2025-04-08",
       "status": "Not Started",
       "priority": "Medium",
+      "created_at": "2025-04-07T00:00:00Z",
+      "updated_at": "2025-04-07T00:00:00Z",
       "subtasks": [
         {
           "id": 1,
@@ -54,7 +64,9 @@
           "start_date": "2025-04-07",
           "end_date": "2025-04-08",
           "status": "Not Started",
-          "priority": "Medium"
+          "priority": "Medium",
+          "created_at": "2025-04-07T00:00:00Z",
+          "updated_at": "2025-04-07T00:00:00Z"
         }
       ]
     },
@@ -66,6 +78,8 @@
       "end_date": "2025-04-10",
       "status": "Completed",
       "priority": "Low",
+      "created_at": "2025-04-09T00:00:00Z",
+      "updated_at": "2025-04-10T00:00:00Z",
       "subtasks": [
         {
           "id": 1,
@@ -74,7 +88,9 @@
           "start_date": "2025-04-09",
           "end_date": "2025-04-10",
           "status": "Completed",
-          "priority": "Low"
+          "priority": "Low",
+          "created_at": "2025-04-09T00:00:00Z",
+          "updated_at": "2025-04-10T00:00:00Z"
         }
       ]
     },
@@ -86,6 +102,8 @@
       "end_date": "2025-04-12",
       "status": "In Progress",
       "priority": "High",
+      "created_at": "2025-04-11T00:00:00Z",
+      "updated_at": "2025-04-11T00:00:00Z",
       "subtasks": [
         {
           "id": 1,
@@ -94,7 +112,9 @@
           "start_date": "2025-04-11",
           "end_date": "2025-04-12",
           "status": "In Progress",
-          "priority": "High"
+          "priority": "High",
+          "created_at": "2025-04-11T00:00:00Z",
+          "updated_at": "2025-04-11T00:00:00Z"
         }
       ]
     },
@@ -106,6 +126,8 @@
       "priority": "high",
       "start_date": "2025-04-27T07:30:42.659Z",
       "end_date": "2025-04-27T19:30:42.659Z",
+      "created_at": "2025-04-27T00:00:00Z",
+      "updated_at": "2025-04-27T00:00:00Z",
       "subtasks": []
     },
     {
@@ -116,6 +138,8 @@
       "priority": "high",
       "start_date": "2025-05-06T07:30:04.699Z",
       "end_date": "2025-05-06T10:00:04.699Z",
+      "created_at": "2025-05-06T00:00:00Z",
+      "updated_at": "2025-05-06T00:00:00Z",
       "subtasks": []
     },
     {
@@ -126,6 +150,8 @@
       "priority": "low",
       "start_date": "2025-04-29T09:12:39.696Z",
       "end_date": "2025-05-07T02:12:39.696Z",
+      "created_at": "2025-04-29T00:00:00Z",
+      "updated_at": "2025-04-29T00:00:00Z",
       "subtasks": []
     }
   ]

@@ -8,8 +8,8 @@ const DateTimeOrTimeRangePicker = ({ value, onChange }) => {
 
     const [pickerType, setPickerType] = React.useState('dateTime'); // 'dateTime' or 'timeRange'
     const now = new Date();
-    const [start, setStart] = React.useState(value.start);
-    const [end, setEnd] = React.useState(value.end);
+    const [start, setStart] = React.useState(value?.start || now);
+    const [end, setEnd] = React.useState(value?.end || now);
     
     React.useEffect(() => {
       if (onChange) {
