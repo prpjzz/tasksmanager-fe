@@ -10,6 +10,7 @@ import {
     FormControlLabel,
     Radio,
     Divider,
+    Snackbar,
     Alert
 } from '@mui/material';
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
@@ -20,6 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const AddTask = () => {
     const { user } = useAuth();
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [dateTimeRange, setDateTimeRange] = useState({
         start: new Date(),
         end: new Date(),
@@ -74,6 +76,16 @@ const AddTask = () => {
     const handleTaskTypeChange = (e) => {
         console.log(e.target.value);
         setTaskType(e.target.value);
+
+        if (e.target.value === 'main') {
+            setDateTimeRange((prev) => {
+                return {
+                    ...prev,
+                    start: new Date(),
+                    end: new Date(),
+                };
+            })
+        }
     };
 
     const handleDateTimeChange = useCallback((newRange) => {
@@ -103,8 +115,8 @@ const AddTask = () => {
             ) {
                 return {
                     ...prev,
-                    start: selectedTask.start_date,
-                    end: selectedTask.end_date,
+                    start: new Date(selectedTask.start_date).getTime(),
+                    end: new Date(selectedTask.end_date).getTime(),
                 };
             }
             return prev;
@@ -151,6 +163,11 @@ const AddTask = () => {
                     }
                 ]
             })
+            setRespone({
+                status: "success",
+                message: `Thêm task phụ "${taskName}" vào "${selectedMainTask.task_name}" thành công`
+            });
+            setSnackbarOpen(true);
         } else {
             const taskData = {
                 userid: user.id,
@@ -172,12 +189,14 @@ const AddTask = () => {
                     message: "Thêm công việc thành công"
                 });
                 setMainTasks(prev => prev.map(task => task.id === mainTask ? taskData : task));
+                setSnackbarOpen(true);
             } catch (error) {
                 console.error('Error creating task:', error);
                 setRespone({
                     status: "error",
                     message: "Thêm công việc thất bại, có lỗi xảy ra. Vui lòng thử lại sau"
                 });
+                setSnackbarOpen(true);
             }
         }
 
@@ -265,6 +284,7 @@ const AddTask = () => {
                      <FormControl fullWidth margin="normal">
                         <DateTimeOrTimeRangePicker
                             value={dateTimeRange}
+                            mainTask={mainTask}
                             onChange={handleDateTimeChange}
                         />
                     </FormControl> 
@@ -274,22 +294,6 @@ const AddTask = () => {
                     </Button>
                 </form>
     
-                {response && (
-                    <Alert 
-                        severity={response.success}
-                        onClose={() => setRespone(null)}
-                        sx={{
-                            position: "absolute",
-                            top: "20px",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            width: "300px",
-                            zIndex: 99999,
-                        }}
-                    >
-                        {response.message}
-                    </Alert>
-                )}
             </Box>
 
             <Box sx={{ flex: 1, maxWidth: 600 }}>
@@ -302,8 +306,21 @@ const AddTask = () => {
                     , [mainTasks, subTasks])} 
                 />
             </Box>
+            
+            {response && (
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={() => setSnackbarOpen(false)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert onClose={() => setSnackbarOpen(false)} severity={response.success} variant="filled">
+                        {response.message}
+                    </Alert>
+                </Snackbar>
+            )}
         </Box>
-    );                    
+    );
 }
 
 export default AddTask;

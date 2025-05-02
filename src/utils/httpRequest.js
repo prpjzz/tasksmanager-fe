@@ -14,4 +14,14 @@ export const post = async (url, data = {}) => {
     return response;
 }
 
+export const put = async (url, data = {}) => {
+    const response = await TaskManagerRequest.put(url, data);
+    return response;
+}
+
+export const del = async (url) => {
+    const response = await TaskManagerRequest.delete(url);
+    return response;
+}
+
 export default TaskManagerRequest;
