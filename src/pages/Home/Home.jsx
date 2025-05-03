@@ -4,26 +4,29 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
-import * as taskServices from '../../services/taskServices'; // Import task service
+import * as taskServices from '../../services/taskServices';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Home = () => {
     const [tasks, setTasks] = useState(null); // State to manage tasks
     const [taskDetail, setTaskDetail] = useState(null);
     const [open, setOpen] = useState(false); // State to manage the open/close state of the task detail dialog
+    const { user } = useAuth();
+    console.log('User ID:', user.id); // Log the user ID to check if it's being passed correctly
 
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await taskServices.getAllTasks();
-                console.log('Fetched tasks:', response.data);
-                setTasks(response.data);
+                const response = await taskServices.getTasksByUserId(user.id);
+                console.log('Fetched tasks:', response);
+                setTasks(response);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
         }
 
         fetchTasks(); // Call the function to fetch tasks    
-    }, []); // Empty dependency array to run once on component mount
+    }, [user.id]); // Update dependency array to include user.id
 
     const handleGenerateEvents = (tasks) => {
         return tasks ? tasks.map((task) => ({

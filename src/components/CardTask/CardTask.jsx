@@ -36,7 +36,14 @@ const CardTask = ({ task }) => {
             }}
         >
             <CardContent>
-                <Typography variant="h6">
+                <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                        fontWeight: "bold",
+                        mb: 1,
+                    }}
+                >
                     {task.task_name}
                 </Typography>
                 {task.maintask ? (
@@ -58,7 +65,13 @@ const CardTask = ({ task }) => {
                     variant="body2"
                     color="text.secondary"
                 >
-                    {new Date(task.start_date).toLocaleString()} → {new Date(task.end_date).toLocaleString()}
+                    Start date: {new Date(task.start_date).toLocaleString()}
+                </Typography>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    End date: {new Date(task.end_date).toLocaleString()}
                 </Typography>
                 <Box mt={1}>
                     <Typography

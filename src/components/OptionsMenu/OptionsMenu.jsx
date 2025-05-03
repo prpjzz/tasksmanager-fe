@@ -1,5 +1,6 @@
 
 import * as React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Divider, { dividerClasses } from '@mui/material/Divider';
 import Menu from '@mui/material/Menu';
@@ -11,21 +12,31 @@ import ListItemIcon, { listItemIconClasses } from '@mui/material/ListItemIcon';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import MenuButton from '../MenuButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
 });
 
 export default function OptionsMenu() {
-  console.log('OptionsMenu render');
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <React.Fragment>
       <MenuButton
@@ -55,11 +66,17 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem 
+          component={Link}
+          to="/profile"
+        >Profile</MenuItem>
+        <MenuItem 
+          component={Link}
+          to="/settings"
+        >My account</MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleClose}
+          onClick={handleLogout}
           sx={{
             [`& .${listItemIconClasses.root}`]: {
               ml: 'auto',
