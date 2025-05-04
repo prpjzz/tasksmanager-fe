@@ -1,45 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
-import * as taskServices from '../../services/taskServices';
-import { useAuth } from '../../hooks/auth';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { useTasks } from '../../hooks/tasks';
 
 dayjs.extend(isSameOrBefore);
 
 const Home = () => {
-    const [tasks, setTasks] = useState(null); // State to manage tasks
+    const { data: tasks, isLoading, isFetching } = useTasks();
     const [taskDetail, setTaskDetail] = useState(null);
-    const [open, setOpen] = useState(false); // State to manage the open/close state of the task detail dialog
-    const [loading, setLoading] = useState(true); // State to manage loading state
-    const { user } = useAuth();
-    console.log('User ID:', user.id); // Log the user ID to check if it's being passed correctly
+    const [open, setOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const response = await taskServices.getTasksByUserId(user.id);
-                console.log('Fetched tasks:', response);
-                setTasks(response);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-            } finally {
-                setLoading(false); // Set loading to false after fetching tasks
-            }
-        }
-
-        fetchTasks(); // Call the function to fetch tasks    
-    }, [user.id]); // Update dependency array to include user.id
-
-    if (loading) {
+    if (isLoading) {
         return <Typography variant="h6" align="center">Loading...</Typography>;
     }
-
+    
+    if (isFetching) {
+        return <Typography variant="h6" align="center">Tải lại dữ liệu...</Typography>;
+    }
+    
     const handleGenerateEvents = (tasks) => {
         return tasks ? tasks.flatMap((task) => ({
             id: task.id,

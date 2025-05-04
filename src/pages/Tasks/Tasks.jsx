@@ -83,7 +83,7 @@ const Task = () => {
     });
 
     const paginatedTasks = filteredTasks.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-    console.log('Paginated tasks:', paginatedTasks);
+    
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
         setPage(1);
