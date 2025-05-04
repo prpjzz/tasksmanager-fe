@@ -64,7 +64,7 @@ export default function SideMenu() {
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
+            {user?.name}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {user?.email}

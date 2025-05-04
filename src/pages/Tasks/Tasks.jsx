@@ -12,6 +12,7 @@ import {
     Grid,
     Snackbar,
     Alert,
+    capitalize
 } from '@mui/material';
 import TaskCardWrapper from './TaskCardWrapper';
 import * as taskServices from '../../services/taskServices';
@@ -19,14 +20,33 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Task = () => {
     const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
     const [tasks, setTasks] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [priorityFilter, setPriorityFilter] = useState('');
+    const [listStatus, setListStatus] = useState([]);
+    const [listPriority, setListPriority] = useState([]);
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
+
+    useEffect(() => {
+        const fetchStatusAndPriority = async () => {
+            try {
+                const listStatus = await taskServices.getStatusTask();
+                const listPriority = await taskServices.getPriorityTask();
+
+                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
+                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
+            } catch (error) {
+                console.error('Error fetching status and priority:', error);
+            }
+        };
+
+        fetchStatusAndPriority();
+    }, [])
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -51,10 +71,16 @@ const Task = () => {
                 }
             } catch (error) {
                 console.error('Error fetching main tasks:', error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchTasks();
     }, [user.id]);
+
+    if (loading) {
+        return <Typography variant="h6" align="center">Loading...</Typography>;
+    }
 
     const filteredTasks = tasks.filter(task => {
         return (
@@ -79,28 +105,28 @@ const Task = () => {
             await taskServices.updateTask(task.id, task);
 
             // Set lại dữ liệu tasks mới
-                let mainTasks = tasks.map(t => t.id === task.id ? { ...task, subtasks: task.subtasks } : t);
-                // Lọc ra các task chính (task không có maintask_id)
-                mainTasks = mainTasks.filter(t => t.subtasks && t.subtasks.length >= 0);
-            
-                console.log('mainTasks', mainTasks);
-                const subTasks = mainTasks.reduce((acc, task) => {
-                    // task không có subtasks thì không cần xử lý   
-                    if (!task.subtasks || task.subtasks.length === 0) return acc;
-            
-                    let tmp = task.subtasks.map(subtask => {
-                        return {
-                            ...subtask,
-                            maintask: task.task_name,
-                            maintask_id: task.id,
-                        }
-                    })
-                    acc.push(...tmp);
-                    return acc;
-                }, []);
-                console.log('subTasks', subTasks);
-                setTasks([...mainTasks, ...subTasks]);
-            
+            let mainTasks = tasks.map(t => t.id === task.id ? { ...task, subtasks: task.subtasks } : t);
+            // Lọc ra các task chính (task không có maintask_id)
+            mainTasks = mainTasks.filter(t => t.subtasks && t.subtasks.length >= 0);
+
+            console.log('mainTasks', mainTasks);
+            const subTasks = mainTasks.reduce((acc, task) => {
+                // task không có subtasks thì không cần xử lý   
+                if (!task.subtasks || task.subtasks.length === 0) return acc;
+
+                let tmp = task.subtasks.map(subtask => {
+                    return {
+                        ...subtask,
+                        maintask: task.task_name,
+                        maintask_id: task.id,
+                    }
+                })
+                acc.push(...tmp);
+                return acc;
+            }, []);
+            console.log('subTasks', subTasks);
+            setTasks([...mainTasks, ...subTasks]);
+
             setSnackbarMessage('Đã cập nhật thành công');
             setSnackbarOpen(true);
         } catch (error) {
@@ -113,7 +139,7 @@ const Task = () => {
     const handleDeleteTask = async (task) => {
         // Logic to delete task
         console.log('Delete task:', task);
-        
+
         try {
             if (task.maintask_id) {
                 const mainTask = tasks.find(t => t.id === task.maintask_id);
@@ -132,7 +158,7 @@ const Task = () => {
                 await taskServices.deleteTask(task.id);
                 setSnackbarMessage(`Đã xoá task "${task.task_name}"`);
             }
-    
+
             setTasks(tasks.filter(t => t.id !== task.id));
         } catch (error) {
             setSnackbarMessage(`Lỗi khi xoá task "${task.task_name}"`);
@@ -160,8 +186,11 @@ const Task = () => {
                         label="Status"
                     >
                         <MenuItem value="">All</MenuItem>
-                        <MenuItem value="Completed">Completed</MenuItem>
-                        <MenuItem value="Pending">Pending</MenuItem>
+                        {listStatus.map((status) => (
+                            <MenuItem key={status.value} value={status.value}>
+                                {status.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
                 <FormControl variant="outlined" sx={{ minWidth: 150 }}>
@@ -172,9 +201,11 @@ const Task = () => {
                         label="Priority"
                     >
                         <MenuItem value="">All</MenuItem>
-                        <MenuItem value="Low">Low</MenuItem>
-                        <MenuItem value="Medium">Medium</MenuItem>
-                        <MenuItem value="High">High</MenuItem>
+                        {listPriority.map((priority) => (
+                            <MenuItem key={priority.value} value={priority.value}>
+                                {priority.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Stack>

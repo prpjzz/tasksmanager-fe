@@ -39,6 +39,7 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
+  overflowY: 'auto',
   '&::before': {
     content: '""',
     display: 'block',
@@ -57,6 +58,8 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
 
 export default function Register() {
   const [generalErrorMessage, setGeneralErrorMessage] = React.useState('');
+  const [nameError, setNameError] = React.useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -82,6 +85,7 @@ export default function Register() {
 
     try {
       await user.register({
+        name: data.get('name'),
         email: data.get('email'),
         password: data.get('password'),
       });
@@ -93,11 +97,21 @@ export default function Register() {
   };
 
   const validateInputs = () => {
+    const name = document.getElementById('name');
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirmPassword');
 
     let isValid = true;
+
+    if (!name.value || name.value.length < 3) {
+      setNameError(true);
+      setNameErrorMessage('User name must be at least 3 characters long.');
+      isValid = false;
+    } else {
+      setNameError(false);
+      setNameErrorMessage('');
+    }
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
@@ -159,6 +173,23 @@ export default function Register() {
               gap: 2,
             }}
           >
+            <FormControl>
+              <FormLabel htmlFor="name">User name</FormLabel>
+              <TextField
+                error={nameError}
+                helperText={nameErrorMessage}
+                id="name"
+                type="name"
+                name="name"
+                placeholder="John Doe"
+                autoComplete="name"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={nameError ? 'error' : 'primary'}
+              />
+            </FormControl>
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField

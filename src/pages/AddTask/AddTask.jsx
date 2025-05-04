@@ -11,7 +11,8 @@ import {
     Radio,
     Divider,
     Snackbar,
-    Alert
+    Alert,
+    capitalize
 } from '@mui/material';
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
 import Selection from '../../components/Form/Selection';
@@ -31,11 +32,14 @@ const AddTask = () => {
     const [taskDescription, setTaskDescription] = useState('');
     const [mainTasks, setMainTasks] = useState([]);
     const [subTasks, setSubTasks] = useState([]);
-    const [status, setStatus] = useState('not_started');
-    const [priority, setPriority] = useState('low');
+    const [status, setStatus] = useState('To Do');
+    const [listStatus, setListStatus] = useState([]);
+    const [priority, setPriority] = useState('Low');
+    const [listPriority, setListPriority] = useState([]);
     const [mainTask, setMainTask] = useState('');
     const [taskType, setTaskType] = useState('main');
     const [response, setRespone] = useState(null);
+    console.log('maintasks: ', mainTasks);
     
     useEffect(() => {
         const fetchMainTasks = async () => {
@@ -65,7 +69,21 @@ const AddTask = () => {
                 console.error('Error fetching main tasks:', error);
             }
         };
+    
+        const fetchStatusAndPriority = async () => {
+            try {
+                const listStatus = await taskServices.getStatusTask();
+                const listPriority = await taskServices.getPriorityTask();
+    
+                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
+                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
+            } catch (error) {
+                console.error('Error fetching status and priority:', error);
+            }
+        };
+
         fetchMainTasks();
+        fetchStatusAndPriority();
     }, [user.id]);
     
     const menuitems = useMemo(() => 
@@ -188,7 +206,7 @@ const AddTask = () => {
                     status: "success",
                     message: "Thêm công việc thành công"
                 });
-                setMainTasks(prev => prev.map(task => task.id === mainTask ? taskData : task));
+                setMainTasks(prev => [...prev, response.data]);
                 setSnackbarOpen(true);
             } catch (error) {
                 console.error('Error creating task:', error);
@@ -239,10 +257,8 @@ const AddTask = () => {
                         value={status}
                         onChange={handleStatusChange}
                         menuitems={useMemo(() => [
-                            { value: 'not_started', label: 'Chưa bắt đầu' },
-                            { value: 'in_progress', label: 'Đang tiến hành' },
-                            { value: 'completed', label: 'Đã hoàn thành' },
-                        ], [])}
+                            ...listStatus,
+                        ], [listStatus])}
                     />
     
                     <Selection
@@ -251,10 +267,8 @@ const AddTask = () => {
                         value={priority}
                         onChange={handlePriorityChange}
                         menuitems={useMemo(() => [
-                            { value: 'low', label: 'Thấp' },
-                            { value: 'medium', label: 'Trung bình' },
-                            { value: 'high', label: 'Cao' },
-                        ], [])}
+                            ...listPriority,
+                        ], [listPriority])}
                     /> 
     
                     {mainTasks && mainTasks.length > 0 ? (
@@ -302,7 +316,7 @@ const AddTask = () => {
                     tasks={useMemo(() => [
                         ...mainTasks,
                         ...subTasks,
-                    ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                     , [mainTasks, subTasks])} 
                 />
             </Box>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Typography from '@mui/material/Typography';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -6,11 +7,16 @@ import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
 import * as taskServices from '../../services/taskServices';
 import { useAuth } from '../../contexts/AuthContext';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrBefore);
 
 const Home = () => {
     const [tasks, setTasks] = useState(null); // State to manage tasks
     const [taskDetail, setTaskDetail] = useState(null);
     const [open, setOpen] = useState(false); // State to manage the open/close state of the task detail dialog
+    const [loading, setLoading] = useState(true); // State to manage loading state
     const { user } = useAuth();
     console.log('User ID:', user.id); // Log the user ID to check if it's being passed correctly
 
@@ -22,22 +28,34 @@ const Home = () => {
                 setTasks(response);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
+            } finally {
+                setLoading(false); // Set loading to false after fetching tasks
             }
         }
 
         fetchTasks(); // Call the function to fetch tasks    
     }, [user.id]); // Update dependency array to include user.id
 
+    if (loading) {
+        return <Typography variant="h6" align="center">Loading...</Typography>;
+    }
+
     const handleGenerateEvents = (tasks) => {
-        return tasks ? tasks.map((task) => ({
+        return tasks ? tasks.flatMap((task) => ({
             id: task.id,
+            group: `task-${task.id}`,
             title: task.task_name,
             start: task.start_date,
-            end: task.end_date,
+            end: task?.extend_date || task.end_date,
             description: task.task_description,
             status: task.status,
             priority: task.priority,
             subtasks: task.subtasks,
+            extendedProps: {
+                taskId: task.id,
+                extend_date: task?.extend_date || null,
+                isExtension: false
+            }
         })) : [];
     }
 
@@ -50,6 +68,7 @@ const Home = () => {
             subtasks: info.event.extendedProps.subtasks,
             start: info.event.start ? info.event.start.toISOString() : null,
             end: info.event.end ? info.event.end.toISOString() : null,
+            extend_date: info.event.extendedProps?.extend_date || null,
         });
         setOpen(true); // Open the task detail dialog
     }
@@ -71,7 +90,7 @@ const Home = () => {
         >
             <div
                 style={{
-                    flex: 1, 
+                    flex: 1,
                     width: '100%',
                 }}
             >
@@ -83,21 +102,18 @@ const Home = () => {
                         center: 'title',
                         right: 'dayGridMonth,dayGridWeek,dayGridDay',
                     }}
-                    editable={true}         // Cho phép kéo thả trong calendar
-                    droppable={true}        // Cho phép kéo thả từ bên ngoài vào calendar
-                    events={handleGenerateEvents(tasks)} // Pass the generated events to FullCalendar
-                    drop={(info) => {
-                        // Handle drop event here
-                        console.log('Dropped event:', info);
-                    }}
+                    editable={true}
+                    droppable={true}
+                    events={handleGenerateEvents(tasks)}
                     eventClick={(info) => {
                         // Handle event click here
                         console.log('Clicked event:', info);
                         handleViewDetails(info);
                     }}
+                    height="auto"
                 />
             </div>
-    
+
             {taskDetail !== null && (
                 <TaskDetail
                     open={open} // Pass the open state to TaskDetail

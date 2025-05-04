@@ -24,7 +24,7 @@ const TaskDetail = ({ open, task, onClose }) => {
 							Start Date: {new Date(task.start).toLocaleString()}
 						</Typography>
 						<Typography variant="subtitle1">
-							End Date: {new Date(task.end).toLocaleString()}
+							End Date: {new Date(task?.extend_date ?? task.end).toLocaleString()}
 						</Typography>
 						<Typography variant="subtitle1">
 							Status: {task.status}
