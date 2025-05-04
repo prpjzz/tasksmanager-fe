@@ -1,6 +1,4 @@
 import {
-    createContext,
-    useContext,
     useState,
     useEffect,
 } from "react";
@@ -10,10 +8,9 @@ import {
     register,
     getCurrentUser,
     saveUser
-} from "../services/authServices";
-import * as userServices from "../services/userServices";
-
-const AuthContext = createContext(undefined);
+} from "../../services/authServices";
+import Context from "./Context";
+import * as userServices from "../../services/userServices";
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -76,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider
+        <Context.Provider
             value={{
                 user,
                 validateLogin: validateLogin,
@@ -87,14 +84,6 @@ export const AuthProvider = ({ children }) => {
             }}
         >
             {children}
-        </AuthContext.Provider>
+        </Context.Provider>
     );
-};
-
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
 };

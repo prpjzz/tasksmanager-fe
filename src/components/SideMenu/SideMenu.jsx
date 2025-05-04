@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuContent from '../MenuContent';
 import OptionsMenu from '../OptionsMenu';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/auth';
 
 const drawerWidth = 240;
 

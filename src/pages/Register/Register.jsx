@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import Alert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/auth';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',

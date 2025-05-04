@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
 import * as taskServices from '../../services/taskServices';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/auth';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
