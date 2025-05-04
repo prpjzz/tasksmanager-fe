@@ -74,3 +74,33 @@ export const getTaskById = async (taskId) => {
         throw new Error('Error fetching task by ID: ' + error.message);
     }
 }
+
+export const getStatusTask = async () => {
+    return [
+        { id: 1, name: 'To Do' },
+        { id: 2, name: 'In Progress' },
+        { id: 3, name: 'Completed' }
+    ];
+    // try {
+    //     const response = await httpRequest.get('/status');
+    //     return response.data;
+    // } catch (error) {
+    //     console.error('Error fetching status:', error);
+    //     throw new Error('Error fetching status: ' + error.message);
+    // }
+} 
+
+export const getPriorityTask = async () => {
+    return [
+        { id: 1, name: 'Low' },
+        { id: 2, name: 'Medium' },
+        { id: 3, name: 'High' }
+    ];
+    // try {
+    //     const response = await httpRequest.get('/priority');
+    //     return response.data;
+    // } catch (error) {
+    //     console.error('Error fetching priority:', error);
+    //     throw new Error('Error fetching priority: ' + error.message);
+    // }
+}

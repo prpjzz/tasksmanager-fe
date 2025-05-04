@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -6,7 +6,7 @@ import {
     DialogActions,
     TextField,
     Button,
-    MenuItem
+    capitalize,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -16,15 +16,42 @@ import Selection from '../Form/Selection';
 import * as taskServices from '../../services/taskServices';
 
 const EditTaskDialog = ({ open, onClose, task, onSave }) => {
-    console.log('task: ', task)
-
     const [editedTask, setEditedTask] = useState({
         ...task,
-        end_date: task.end_date ? new Date(task.end_date) : null,
+        extend_date: task.extend_date ? new Date(task.extend_date) : new Date(task.end_date),
     });
     const [status, setStatus] = useState(task.status);
+    const [priority, setPriority] = useState(task.priority);
+    const [mainTask, setMainTask] = useState(null);
+    const [listStatus, setListStatus] = useState([]);
+    const [listPriority, setListPriority] = useState([]);
 
+    useEffect(() => {
+        const fetchMainTask = async () => {
+            if (open && editedTask.maintask_id) {
+                const mainTask = await taskServices.getTaskById(editedTask.maintask_id);
+                if (mainTask) {
+                    setMainTask(mainTask);
+                }
+            }
+        }
 
+        const fetchStatusAndPriority = async () => {
+            if (!open) return;
+            try {
+                const listStatus = await taskServices.getStatusTask();
+                const listPriority = await taskServices.getPriorityTask();
+    
+                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
+                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
+            } catch (error) {
+                console.error('Error fetching status and priority:', error);
+            }
+        };
+
+        fetchStatusAndPriority();
+        fetchMainTask();
+    }, [open, editedTask.maintask_id])
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -35,8 +62,12 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
         setStatus(e.target.value);
     }, []);
     
+    const handlePriorityChange = useCallback((e) => {
+        setPriority(e.target.value);
+    }, []);
+    
     const handleDateChange = (newValue) => {
-        setEditedTask((prev) => ({ ...prev, end_date: newValue }));
+        setEditedTask((prev) => ({ ...prev, extend_date: newValue }));
     };
     
     const handleSave = async () => {
@@ -51,7 +82,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                                 return {
                                     ...editedTask,
                                     status,
-                                    end_date: editedTask.end_date,
+                                    extend_date: editedTask.extend_date,
                                     updated_at: new Date(),
                                 };
                             }
@@ -64,7 +95,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
             onSave({
                 ...editedTask,
                 status,
-                end_date: editedTask.end_date,
+                extend_date: editedTask.extend_date,
                 updated_at: new Date(),
             });
         }
@@ -100,19 +131,26 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     value={status}
                     onChange={handleStatusChange}
                     menuitems={useMemo(() => [
-                        { value: 'not_started', label: 'Chưa bắt đầu' },
-                        { value: 'in_progress', label: 'Đang tiến hành' },
-                        { value: 'completed', label: 'Đã hoàn thành' },
-                    ], [])}
+                        ...listStatus,
+                    ], [listStatus])}
+                />
+                <Selection
+                    title="Độ ưu tiên"
+                    name="priority"
+                    value={priority}
+                    onChange={handlePriorityChange}
+                    menuitems={useMemo(() => [
+                        ...listPriority,
+                    ], [listPriority])}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                     <DateTimePicker
                         label="Deadline"
-                        value={new Date(editedTask.end_date).getTime()}
+                        value={new Date(editedTask.extend_date).getTime()}
                         onChange={handleDateChange}
                         minDateTime={new Date(editedTask.start_date).getTime()}
-                        {...((editedTask.mainTask && editedTask.mainTask !== '') ?
-                            { maxDateTime: new Date(editedTask.end_date).getTime() } : {})}
+                        {...((mainTask && mainTask.end_date) ?
+                            { maxDateTime: new Date(mainTask?.extend_date ?? mainTask.end_date).getTime() } : {})}
                         enableAccessibleFieldDOMStructure={false}
                         slots={{ textField: TextField }}
                     />

@@ -71,7 +71,7 @@ const CardTask = ({ task }) => {
                     variant="body2"
                     color="text.secondary"
                 >
-                    End date: {new Date(task.end_date).toLocaleString()}
+                    End date: {new Date(task?.extend_date ?? task.end_date).toLocaleString()}
                 </Typography>
                 <Box mt={1}>
                     <Typography

@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuContent from '../MenuContent';
 import OptionsMenu from '../OptionsMenu';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/auth';
 
 const drawerWidth = 240;
 
@@ -64,7 +64,7 @@ export default function SideMenu() {
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
+            {user?.name}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {user?.email}

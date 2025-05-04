@@ -12,51 +12,69 @@ import {
     Grid,
     Snackbar,
     Alert,
+    capitalize
 } from '@mui/material';
 import TaskCardWrapper from './TaskCardWrapper';
 import * as taskServices from '../../services/taskServices';
-import { useAuth } from '../../contexts/AuthContext';
+import { useTasks, useUpdateTask, useDeleteTask } from '../../hooks/tasks';
 
 const Task = () => {
-    const { user } = useAuth();
-    const [tasks, setTasks] = useState([]);
+    const { data: tasks, isLoading, isFetching } = useTasks();
+    const updateTask = useUpdateTask();
+    const deleteTask = useDeleteTask();
+    
+    const [allTasks, setAllTasks] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [priorityFilter, setPriorityFilter] = useState('');
+    const [listStatus, setListStatus] = useState([]);
+    const [listPriority, setListPriority] = useState([]);
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
 
     useEffect(() => {
-        const fetchTasks = async () => {
+        const fetchStatusAndPriority = async () => {
             try {
-                const response = await taskServices.getTasksByUserId(user.id);
-                if (response && response.length > 0) {
-                    const activeTasks = response;
+                const listStatus = await taskServices.getStatusTask();
+                const listPriority = await taskServices.getPriorityTask();
 
-                    const subTasks = activeTasks.reduce((acc, task) => {
-                        let tmp = task.subtasks.map(subtask => {
-                            return {
-                                ...subtask,
-                                maintask: task.task_name,
-                                maintask_id: task.id,
-                            }
-                        })
-                        acc.push(...tmp);
-                        return acc;
-                    }, []);
-
-                    setTasks([...activeTasks, ...subTasks]);
-                }
+                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
+                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
             } catch (error) {
-                console.error('Error fetching main tasks:', error);
+                console.error('Error fetching status and priority:', error);
             }
         };
-        fetchTasks();
-    }, [user.id]);
 
-    const filteredTasks = tasks.filter(task => {
+        fetchStatusAndPriority();
+    }, [])
+
+    useEffect(() => {
+        if (tasks && tasks.length > 0) {
+            const subTasks = tasks.reduce((acc, task) => {
+                const tmp = (task.subtasks || []).map(subtask => ({
+                    ...subtask,
+                    maintask: task.task_name,
+                    maintask_id: task.id,
+                }));
+                acc.push(...tmp);
+                return acc;
+            }, []);
+
+            setAllTasks([...tasks, ...subTasks]);
+        }
+    }, [tasks]);
+
+    if (isLoading) {
+        return <Typography variant="h6" align="center">Loading...</Typography>;
+    }
+
+    if (isFetching) {
+        return <Typography variant="h6" align="center">Tải lại dữ liệu...</Typography>;
+    }
+
+    const filteredTasks = allTasks.filter(task => {
         return (
             task.task_name.toLowerCase().includes(search.toLowerCase()) &&
             (statusFilter ? task.status === statusFilter : true) &&
@@ -65,7 +83,7 @@ const Task = () => {
     });
 
     const paginatedTasks = filteredTasks.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-
+    
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
         setPage(1);
@@ -75,68 +93,55 @@ const Task = () => {
         // Logic to edit task
         console.log('Edit task:', task);
 
-        try {
-            await taskServices.updateTask(task.id, task);
-
-            // Set lại dữ liệu tasks mới
-                let mainTasks = tasks.map(t => t.id === task.id ? { ...task, subtasks: task.subtasks } : t);
-                // Lọc ra các task chính (task không có maintask_id)
-                mainTasks = mainTasks.filter(t => t.subtasks && t.subtasks.length >= 0);
-            
-                console.log('mainTasks', mainTasks);
-                const subTasks = mainTasks.reduce((acc, task) => {
-                    // task không có subtasks thì không cần xử lý   
-                    if (!task.subtasks || task.subtasks.length === 0) return acc;
-            
-                    let tmp = task.subtasks.map(subtask => {
-                        return {
-                            ...subtask,
-                            maintask: task.task_name,
-                            maintask_id: task.id,
-                        }
-                    })
-                    acc.push(...tmp);
-                    return acc;
-                }, []);
-                console.log('subTasks', subTasks);
-                setTasks([...mainTasks, ...subTasks]);
-            
-            setSnackbarMessage('Đã cập nhật thành công');
-            setSnackbarOpen(true);
-        } catch (error) {
-            console.error('Error updating task:', error);
-            setSnackbarMessage(`Lỗi khi cập nhật task "${task.task_name}"`);
-            setSnackbarOpen(true);
-        }
+        updateTask.mutate(task, {
+            onSuccess: () => {
+                setSnackbarMessage(`Đã cập nhật task "${task.task_name}"`);
+                setSnackbarOpen(true);
+            },
+            onError: (error) => {
+                setSnackbarMessage(`Lỗi khi cập nhật task "${task.task_name}"`);
+                console.error('Error updating task:', error);
+                setSnackbarOpen(true);
+            }
+        });
     };
 
     const handleDeleteTask = async (task) => {
         // Logic to delete task
         console.log('Delete task:', task);
-        
-        try {
-            if (task.maintask_id) {
-                const mainTask = tasks.find(t => t.id === task.maintask_id);
-                if (mainTask) {
-                    // Nếu là subtask thì tìm maintask chứa subtask cần xóa
-                    const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask.id !== task.id);
 
-                    // Update lại maintask
-                    await taskServices.updateTask(mainTask.id, { ...mainTask, subtasks: updatedSubtasks });
+        if (task.maintask_id) {
+            // Nếu là subtask thì tìm maintask chứa subtask cần xóa
+            const mainTask = tasks.find(t => t.id === task.maintask_id);
+            if (mainTask) {
+                // Xóa subtask khỏi maintask
+                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask.id !== task.id);
 
-                    setTasks(tasks.map(t => t.id === mainTask.id ? { ...mainTask, subtasks: updatedSubtasks } : t));
-                    setSnackbarMessage(`Đã xoá subtask "${task.task_name}"`);
-                }
-            } else {
-                // Nếu là task chính thì xóa
-                await taskServices.deleteTask(task.id);
-                setSnackbarMessage(`Đã xoá task "${task.task_name}"`);
+                // Update lại maintask
+                updateTask.mutate({
+                    ...mainTask,
+                    subtasks: updatedSubtasks,
+                }, {
+                    onSuccess: () => {
+                        setSnackbarMessage(`Đã xoá subtask "${task.task_name}"`);
+                    },
+                    onError: (error) => {
+                        setSnackbarMessage(`Lỗi khi xoá subtask "${task.task_name}"`);
+                        console.error('Error deleting subtask:', error);
+                    }
+                });
             }
-    
-            setTasks(tasks.filter(t => t.id !== task.id));
-        } catch (error) {
-            setSnackbarMessage(`Lỗi khi xoá task "${task.task_name}"`);
-            console.error('Error deleting task:', error);
+        } else {
+            // Nếu là task chính thì xóa
+            deleteTask.mutate(task.id, {
+                onSuccess: () => {
+                    setSnackbarMessage(`Đã xoá task "${task.task_name}"`);
+                },
+                onError: (error) => {
+                    setSnackbarMessage(`Lỗi khi xoá task "${task.task_name}"`);
+                    console.error('Error deleting task:', error);
+                }
+            });
         }
 
         setSnackbarOpen(true);
@@ -160,8 +165,11 @@ const Task = () => {
                         label="Status"
                     >
                         <MenuItem value="">All</MenuItem>
-                        <MenuItem value="Completed">Completed</MenuItem>
-                        <MenuItem value="Pending">Pending</MenuItem>
+                        {listStatus.map((status) => (
+                            <MenuItem key={status.value} value={status.value}>
+                                {status.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
                 <FormControl variant="outlined" sx={{ minWidth: 150 }}>
@@ -172,9 +180,11 @@ const Task = () => {
                         label="Priority"
                     >
                         <MenuItem value="">All</MenuItem>
-                        <MenuItem value="Low">Low</MenuItem>
-                        <MenuItem value="Medium">Medium</MenuItem>
-                        <MenuItem value="High">High</MenuItem>
+                        {listPriority.map((priority) => (
+                            <MenuItem key={priority.value} value={priority.value}>
+                                {priority.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
             </Stack>
