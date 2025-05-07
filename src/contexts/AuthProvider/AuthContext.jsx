@@ -2,6 +2,7 @@ import {
     useState,
     useEffect,
 } from "react";
+import { jwtDecode } from 'jwt-decode';
 import {
     login,
     logout,
@@ -19,25 +20,15 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const storedUser = getCurrentUser();
         if (storedUser) {
-            setUser(storedUser);
+            setUser(jwtDecode(storedUser));
         }
         setLoading(false);
     }, []);
 
-    const validateLogin = async (username, password) => {
-        const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-        const foundUser = storedUsers.find(
-            (user) => user.username === username && user.password === password
-        );
-
-        return !!foundUser;
-    };
-
     const handleLogin = async (username, password) => {
         try {
-            const user = await login(username, password);
-            setUser(user);
-            return user;
+            const token = await login(username, password);
+            setUser(jwtDecode(token));
         } catch (error) {
             throw new Error("Login failed: " + error.message);
         }
@@ -50,8 +41,7 @@ export const AuthProvider = ({ children }) => {
 
     const handleRegister = async (userData) => {
         try {
-            const user = await register(userData);
-            return user;
+            await register(userData);
         } catch (error) {
             throw new Error("Registration failed: " + error.message);
         }
@@ -76,7 +66,6 @@ export const AuthProvider = ({ children }) => {
         <Context.Provider
             value={{
                 user,
-                validateLogin: validateLogin,
                 login: handleLogin,
                 logout: handleLogout,
                 register: handleRegister,
