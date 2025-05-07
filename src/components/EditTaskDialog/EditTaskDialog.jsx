@@ -14,8 +14,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import vi from 'date-fns/locale/vi';
 import Selection from '../Form/Selection';
 import * as taskServices from '../../services/taskServices';
+import { useStatusPriority } from '../../hooks/status-priority';
 
 const EditTaskDialog = ({ open, onClose, task, onSave }) => {
+    const { statusTask, priorityTask } = useStatusPriority();
     const [editedTask, setEditedTask] = useState({
         ...task,
         extend_date: task.extend_date ? new Date(task.extend_date) : new Date(task.end_date),
@@ -23,8 +25,6 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
     const [status, setStatus] = useState(task.status);
     const [priority, setPriority] = useState(task.priority);
     const [mainTask, setMainTask] = useState(null);
-    const [listStatus, setListStatus] = useState([]);
-    const [listPriority, setListPriority] = useState([]);
 
     useEffect(() => {
         const fetchMainTask = async () => {
@@ -36,20 +36,6 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
             }
         }
 
-        const fetchStatusAndPriority = async () => {
-            if (!open) return;
-            try {
-                const listStatus = await taskServices.getStatusTask();
-                const listPriority = await taskServices.getPriorityTask();
-    
-                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
-                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
-            } catch (error) {
-                console.error('Error fetching status and priority:', error);
-            }
-        };
-
-        fetchStatusAndPriority();
         fetchMainTask();
     }, [open, editedTask.maintask_id])
 
@@ -131,8 +117,8 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     value={status}
                     onChange={handleStatusChange}
                     menuitems={useMemo(() => [
-                        ...listStatus,
-                    ], [listStatus])}
+                        ...statusTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                    ], [statusTask])}
                 />
                 <Selection
                     title="Độ ưu tiên"
@@ -140,8 +126,8 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     value={priority}
                     onChange={handlePriorityChange}
                     menuitems={useMemo(() => [
-                        ...listPriority,
-                    ], [listPriority])}
+                        ...priorityTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                    ], [priorityTask])}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                     <DateTimePicker

@@ -17,11 +17,12 @@ import {
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
 import Selection from '../../components/Form/Selection';
 import ListTasks from '../../components/ListTasks';
-import * as taskServices from '../../services/taskServices';
 import { useAuth } from '../../hooks/auth';
+import { useStatusPriority } from '../../hooks/status-priority';
 import { useTasks, useUpdateTask, useCreateTask } from '../../hooks/tasks';
 
 const AddTask = () => {
+    const { statusTask, priorityTask } = useStatusPriority();
     const { user } = useAuth();
     const { data: tasks } = useTasks();
     const createTask = useCreateTask();
@@ -38,9 +39,7 @@ const AddTask = () => {
     const [mainTasks, setMainTasks] = useState([]);
     const [subTasks, setSubTasks] = useState([]);
     const [status, setStatus] = useState('To Do');
-    const [listStatus, setListStatus] = useState([]);
     const [priority, setPriority] = useState('Low');
-    const [listPriority, setListPriority] = useState([]);
     const [mainTask, setMainTask] = useState('');
     const [taskType, setTaskType] = useState('main');
     const [response, setRespone] = useState(null);
@@ -69,21 +68,8 @@ const AddTask = () => {
                 setSubTasks(subTasks);
             }
         };
-    
-        const fetchStatusAndPriority = async () => {
-            try {
-                const listStatus = await taskServices.getStatusTask();
-                const listPriority = await taskServices.getPriorityTask();
-    
-                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
-                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
-            } catch (error) {
-                console.error('Error fetching status and priority:', error);
-            }
-        };
 
         fetchMainTasks();
-        fetchStatusAndPriority();
     }, [tasks]);
     
     const menuitems = useMemo(() => 
@@ -236,8 +222,8 @@ const AddTask = () => {
                         value={status}
                         onChange={handleStatusChange}
                         menuitems={useMemo(() => [
-                            ...listStatus,
-                        ], [listStatus])}
+                            ...statusTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                        ], [statusTask])}
                     />
     
                     <Selection
@@ -246,8 +232,8 @@ const AddTask = () => {
                         value={priority}
                         onChange={handlePriorityChange}
                         menuitems={useMemo(() => [
-                            ...listPriority,
-                        ], [listPriority])}
+                            ...priorityTask.map(p => ({ value: p.name, label: capitalize(p.name) })),
+                        ], [priorityTask])}
                     /> 
     
                     {mainTasks && mainTasks.length > 0 ? (

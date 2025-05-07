@@ -15,10 +15,11 @@ import {
     capitalize
 } from '@mui/material';
 import TaskCardWrapper from './TaskCardWrapper';
-import * as taskServices from '../../services/taskServices';
 import { useTasks, useUpdateTask, useDeleteTask } from '../../hooks/tasks';
+import { useStatusPriority } from '../../hooks/status-priority';
 
 const Task = () => {
+    const { statusTask, priorityTask } = useStatusPriority();
     const { data: tasks, isLoading, isFetching } = useTasks();
     const updateTask = useUpdateTask();
     const deleteTask = useDeleteTask();
@@ -29,26 +30,8 @@ const Task = () => {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [priorityFilter, setPriorityFilter] = useState('');
-    const [listStatus, setListStatus] = useState([]);
-    const [listPriority, setListPriority] = useState([]);
     const [page, setPage] = useState(1);
     const rowsPerPage = 10;
-
-    useEffect(() => {
-        const fetchStatusAndPriority = async () => {
-            try {
-                const listStatus = await taskServices.getStatusTask();
-                const listPriority = await taskServices.getPriorityTask();
-
-                setListStatus(listStatus.map(s => ({ value: s.name, label: capitalize(s.name) })));
-                setListPriority(listPriority.map(p => ({ value: p.name, label: capitalize(p.name) })));
-            } catch (error) {
-                console.error('Error fetching status and priority:', error);
-            }
-        };
-
-        fetchStatusAndPriority();
-    }, [])
 
     useEffect(() => {
         if (tasks && tasks.length > 0) {
@@ -165,9 +148,9 @@ const Task = () => {
                         label="Status"
                     >
                         <MenuItem value="">All</MenuItem>
-                        {listStatus.map((status) => (
-                            <MenuItem key={status.value} value={status.value}>
-                                {status.label}
+                        {statusTask.map((status) => (
+                            <MenuItem key={status.id} value={status.name}>
+                                {capitalize(status.name)}
                             </MenuItem>
                         ))}
                     </Select>
@@ -180,9 +163,9 @@ const Task = () => {
                         label="Priority"
                     >
                         <MenuItem value="">All</MenuItem>
-                        {listPriority.map((priority) => (
-                            <MenuItem key={priority.value} value={priority.value}>
-                                {priority.label}
+                        {priorityTask.map((priority) => (
+                            <MenuItem key={priority.id} value={priority.name}>
+                                {capitalize(priority.name)}
                             </MenuItem>
                         ))}
                     </Select>
