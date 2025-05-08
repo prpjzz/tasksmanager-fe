@@ -1,4 +1,4 @@
-import * as userServices from './userServices';
+import * as httpRequest from '../utils/httpRequest';
 
 const authKey = 'AUTH_KEY';
 
@@ -8,13 +8,12 @@ export const saveUser = (user) => {
 
 export const login = async (email, password) => {
     try {
-        const user = await userServices.getAllUsers();
-        const foundUser = user.data.find(u => u.email === email && u.password === password);
-        if (foundUser) {
-            saveUser(foundUser);
-            return foundUser;
+        const res = await httpRequest.post('/auth/login', { email, password });
+        if (res.status === 400) {
+            throw new Error('Error: ' + res.data.message);
         } else {
-            throw new Error('Invalid email or password');
+            saveUser(res.data.token);
+            return res.data.token;
         }
     } catch (error) {
         console.error('Error logging in:', error);
@@ -24,13 +23,10 @@ export const login = async (email, password) => {
 
 export const register = async (user) => {
     try {
-        const existingUsers = await userServices.getAllUsers();
-        if (existingUsers.data.some(existingUser => existingUser.email === user.email)) {
-            throw new Error('Email already exists');
+        const res = await httpRequest.post('/auth/register', user);
+        if (res.status === 400) {
+            throw new Error('Error: ' + res.data.message);
         }
-        const newUser = await userServices.createUser(user);
-        saveUser(newUser.data);
-        return newUser.data;
     } catch (error) {
         console.error('Error registering:', error);
         throw new Error('Error registering: ' + error.message);
@@ -43,6 +39,6 @@ export const logout = () => {
 }
 
 export const getCurrentUser = () => {
-    const user = localStorage.getItem(authKey);
-    return user ? JSON.parse(user) : null;
+    const token = localStorage.getItem(authKey);
+    return token ?? null;
 }
