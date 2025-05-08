@@ -168,6 +168,21 @@
       "updated_at": "2025-05-03T16:08:20.343Z"
     }
   ],
+  "schedules": [
+    {
+      "id": "f99c",
+      "title": "Test",
+      "userid": "6472",
+      "days": [
+        "Tuesday",
+        "Thursday",
+        "Saturday"
+      ],
+      "startTime": "07:00",
+      "endTime": "08:00",
+      "repeat": "weekly"
+    }
+  ],
   "users": [
     {
       "id": "1",
