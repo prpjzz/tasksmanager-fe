@@ -15,11 +15,13 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import RemoveDoneIcon from '@mui/icons-material/RemoveDone';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { styled } from '@mui/material/styles';
 
 const mainListItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, path: '/' },
   { text: 'Add Task', icon: <AddTaskIcon />, path: '/add-task' },
+  { text: 'Add Schedule', icon: <ScheduleIcon />, path: '/add-schedule' },
   { text: 'Todos', icon: <FormatListBulletedIcon />, path: '/todos' },
   { text: 'Tasks', icon: <AssignmentRoundedIcon />, path: '/tasks' },
   { text: 'Tasks Completed', icon: <ChecklistIcon />, path: '/tasks-completed' },
