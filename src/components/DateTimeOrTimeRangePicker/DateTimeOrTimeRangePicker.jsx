@@ -1,16 +1,18 @@
 import * as React from 'react';
+import dayjs from 'dayjs';
 import { LocalizationProvider, DateTimePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { TextField, RadioGroup, FormControlLabel, Radio, Box } from '@mui/material';
 import vi from 'date-fns/locale/vi';
 
 const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
-    console.log('DateTimeOrTimeRangePicker render');
-    console.log(value);
-    const [pickerType, setPickerType] = React.useState('dateTime'); // 'dateTime' or 'timeRange'
+    const [pickerType, setPickerType] = React.useState('dateTime');
     const [start, setStart] = React.useState(value?.start || new Date());
     const [end, setEnd] = React.useState(value?.end || new Date());
     const [dateError, setDateError] = React.useState('');
+
+    const mainStart = mainTask?.start_date ? dayjs(mainTask.start_date) : null;
+    const mainEnd = mainTask?.end_date ? dayjs(mainTask.end_date) : null;
 
     React.useEffect(() => {
         if (onChange) {
@@ -24,10 +26,23 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
             setEnd(value.end || new Date());
             setPickerType(value.pickerType || 'dateTime');
         }
-    }, [value])
+    }, [value]);
 
     const handlePickerTypeChange = (event) => {
         setPickerType(event.target.value);
+    };
+
+    // Helpers để xử lý min/max cho ngày/giờ
+    const getMinDateTime = (selectedDate) => {
+        if (!mainStart) return null;
+        const selected = dayjs(selectedDate);
+        return selected.isSame(mainStart, 'day') ? mainStart.toDate() : mainStart.startOf('day').toDate();
+    };
+
+    const getMaxDateTime = (selectedDate) => {
+        if (!mainEnd) return null;
+        const selected = dayjs(selectedDate);
+        return selected.isSame(mainEnd, 'day') ? mainEnd.toDate() : mainEnd.endOf('day').toDate();
     };
 
     return (
@@ -50,8 +65,8 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
                             value={start}
                             onChange={(newValue) => setStart(newValue)}
                             onError={(reason) => setDateError(reason)}
-                            minDateTime={start}
-                            {...((mainTask && mainTask !== '') ? { maxDateTime: value.end } : {})}
+                            minDateTime={mainTask ? getMinDateTime(start) : dayjs().startOf('day').toDate()}
+                            maxDateTime={mainTask ? getMaxDateTime(start) : null}
                             enableAccessibleFieldDOMStructure={false}
                             slots={{ textField: TextField }}
                             slotProps={{
@@ -68,8 +83,8 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
                             value={end}
                             onChange={(newValue) => setEnd(newValue)}
                             onError={(reason) => setDateError(reason)}
-                            minDateTime={start}
-                            {...((mainTask && mainTask !== '') ? { maxDateTime: value.end } : {})}
+                            minDateTime={mainTask ? getMinDateTime(end) : start}
+                            maxDateTime={mainTask ? getMaxDateTime(end) : null}
                             enableAccessibleFieldDOMStructure={false}
                             slots={{ textField: TextField }}
                             slotProps={{
@@ -89,8 +104,8 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
                             value={start}
                             onChange={(newValue) => setStart(newValue)}
                             onError={(reason) => setDateError(reason)}
-                            minTime={start}
-                            {...((mainTask && mainTask !== '') ? { maxDateTime: value.end } : {})}
+                            minTime={mainTask ? mainStart?.toDate() : undefined}
+                            maxTime={mainTask ? mainEnd?.toDate() : undefined}
                             enableAccessibleFieldDOMStructure={false}
                             slots={{ textField: TextField }}
                             slotProps={{
@@ -108,7 +123,7 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
                             onChange={(newValue) => setEnd(newValue)}
                             onError={(reason) => setDateError(reason)}
                             minTime={start}
-                            {...((mainTask && mainTask !== '') ? { maxDateTime: value.end } : {})}
+                            maxTime={mainTask ? mainEnd?.toDate() : undefined}
                             enableAccessibleFieldDOMStructure={false}
                             slots={{ textField: TextField }}
                             slotProps={{
@@ -125,6 +140,6 @@ const DateTimeOrTimeRangePicker = ({ value, mainTask, onChange }) => {
             </LocalizationProvider>
         </Box>
     );
-}
+};
 
 export default React.memo(DateTimeOrTimeRangePicker);

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 const Selection = ({ title, value, onChange, menuitems }) => {
-    console.log('Selection render');
 
     return (
         <FormControl fullWidth margin="normal">

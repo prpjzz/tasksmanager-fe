@@ -39,7 +39,6 @@ const LinkBehavior = styled(RouterLink)(() => ({
 }));
 
 export default function MenuContent() {
-  console.log('MenuContent rendered');
   const location = useLocation();
 
   return (

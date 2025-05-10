@@ -1,38 +1,15 @@
-import { useEffect, useState } from 'react';
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 const CardTask = ({ task }) => {
-    const [statusColors, setStatusColors] = useState({});
-    
-    useEffect(() => {
-        const fetchStatusColors = async () => {
-            // const response = await fetch('/api/statusColors');
-            // const data = await response.json();
-            // Fake data for demonstration purposes
-            const data = {
-                "Not Started": "#f44336",
-                "In Progress": "#ff9800",
-                "Completed": "#4caf50",
-                "On Hold": "#2196f3",
-                "Cancelled": "#9e9e9e",
-            };
-            setStatusColors(data);
-        }
-
-        fetchStatusColors();
-    }, []);
-
     return (
         <Card
             variant="outlined"
             sx={{
                 mb: 2,
-                borderLeft: `6px solid ${statusColors[task.status] ||
-                    "#ccc"
-                    }`,
+                borderLeft: `6px solid ${task.status.color}`,
             }}
         >
             <CardContent>
@@ -77,13 +54,10 @@ const CardTask = ({ task }) => {
                     <Typography
                         variant="caption"
                         sx={{
-                            color:
-                                statusColors[
-                                task.status
-                                ] || "#999",
+                            color: task.status.color,
                         }}
                     >
-                        Trạng thái: {task.status}
+                        Trạng thái: {task.status.name}
                     </Typography>
                 </Box>
             </CardContent>

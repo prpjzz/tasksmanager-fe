@@ -12,6 +12,7 @@ import {
 	Box,
 } from "@mui/material";
 import { useAuth } from "../../hooks/auth";
+import { useCreateSchedule } from "../../hooks/schedules";
 
 const weekdays = [
 	{ label: "Thứ 2", value: "Monday" },
@@ -25,6 +26,7 @@ const weekdays = [
 
 const AddSchedule = () => {
 	const { user } = useAuth();
+	const createSchedule = useCreateSchedule();
 	const [title, setTitle] = useState("");
 	const [selectedDays, setSelectedDays] = useState([]);
 	const [startTime, setStartTime] = useState("");
@@ -53,26 +55,19 @@ const AddSchedule = () => {
 			repeat,
 		};
 		console.log("New Schedule:", newSchedule);
-		try {
-			const res = await fetch("http://localhost:3001/schedules", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(newSchedule),
-			});
-
-			if (res.ok) {
-				alert("Thêm lịch học thành công!");
+		createSchedule.mutate(newSchedule, {
+			onSuccess: () => {
+				alert("Thêm lịch học thành công");
 				setTitle("");
 				setSelectedDays([]);
 				setStartTime("");
 				setEndTime("");
-			} else {
-				alert("Lỗi khi gửi dữ liệu");
-			}
-		} catch (err) {
-			console.error("Lỗi kết nối đến server:", err);
-			alert("Không thể kết nối đến server.");
-		}
+				setRepeat("weekly");
+			},
+			onError: (error) => {
+				alert("Có lỗi xảy ra: " + error.message);
+			},
+		});
 	};
 
 	return (

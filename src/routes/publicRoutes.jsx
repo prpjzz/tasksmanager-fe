@@ -1,11 +1,13 @@
-import Home from "../pages/Home";
-import Test from "../pages/Test";
-import AddTask from "../pages/AddTask";
+import { lazy } from "react";
 import DefaultLayout from "../layouts/DefaultLayout";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import Tasks from "../pages/Tasks";
-import AddSchedule from "../pages/AddSchedule";
+
+const Home = lazy(() => import("../pages/Home"));
+const Test = lazy(() => import("../pages/Test"));
+const AddTask = lazy(() => import("../pages/AddTask"));
+const Login = lazy(() => import("../pages/Login"));
+const Register = lazy(() => import("../pages/Register"));
+const Tasks = lazy(() => import("../pages/Tasks"));
+const AddSchedule = lazy(() => import("../pages/AddSchedule"));
 
 const publicRoutes = [
   { path: "/", component: Home, layout: DefaultLayout, requiresAuth: true },

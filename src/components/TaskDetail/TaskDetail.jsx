@@ -9,7 +9,6 @@ import Stack from "@mui/material/Stack";
 import CardTask from "../CardTask";
 
 const TaskDetail = ({ open, task, onClose }) => {
-	console.log("TaskDetail rendered with task: ", task);
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
 			<DialogTitle>Task Details</DialogTitle>
@@ -27,17 +26,17 @@ const TaskDetail = ({ open, task, onClose }) => {
 							End Date: {new Date(task?.extend_date ?? task.end).toLocaleString()}
 						</Typography>
 						<Typography variant="subtitle1">
-							Status: {task.status}
+							Status: {task.status.name}
 						</Typography>
 						<Typography variant="subtitle1">
-							Priority: {task.priority}
+							Priority: {task.priority.name}
 						</Typography>
 						<Typography variant="subtitle1">
 							Danh sách công việc con:
 						</Typography>
 						<Stack spacing={2}>
 							{task.subtasks.map((subtask) => (
-								<CardTask key={subtask.id} task={subtask} />
+								<CardTask key={subtask._id} task={subtask} />
 							))}
 						</Stack>
 					</Box>

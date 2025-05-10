@@ -7,8 +7,6 @@ const RouteGuard = ({children, requiresAuth,}) => {
   if (requiresAuth && !user) {
     return <Navigate to="/login" replace />;
   }
-  
-  console.log("RouteGuard", requiresAuth);
 
   return children;
 };

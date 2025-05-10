@@ -23,7 +23,6 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
-  console.log('SideMenu render');
   const { user } = useAuth();
 
   return (

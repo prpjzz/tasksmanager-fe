@@ -5,19 +5,24 @@ export const getAllTasks = async () => {
         const response = await httpRequest.get('/tasks');
         return response.data;
     } catch (error) {
-        console.error('Error fetching tasks:', error);
-        throw new Error('Error fetching tasks: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
-export const getTasksByUserId = async (userId) => {
+export const getTasksByUserId = async () => {
     try {
-        const response = await getAllTasks();
-        const userTasks = response.filter(task => task.userid === userId);
-        return userTasks;
+        const response = await httpRequest.get('/tasks/me');
+        return response.data;
     } catch (error) {
-        console.error('Error fetching tasks by user ID:', error);
-        throw new Error('Error fetching tasks by user ID: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
@@ -26,8 +31,11 @@ export const createTask = async (task) => {
         const response = await httpRequest.post('/tasks', task);
         return response;
     } catch (error) {
-        console.error('Error creating task:', error);
-        throw new Error('Error creating task: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
@@ -36,32 +44,24 @@ export const updateTask = async (taskId, updatedTask) => {
         const response = await httpRequest.put(`/tasks/${taskId}`, updatedTask);
         return response;
     } catch (error) {
-        console.error('Error updating task:', error);
-        throw new Error('Error updating task: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
 export const deleteTask = async (taskId) => {
     try {
-        // If task have subtasks, convert them to main task
-        const task = await getTaskById(taskId);
-        if (task.subtasks && task.subtasks.length > 0) {
-            await Promise.all(task.subtasks.map(async subtask => {
-                await createTask({
-                    ...subtask,
-                    subtasks: [],
-                    userid: task.userid,
-                    created_at: subtask.created_at || new Date(),
-                    updated_at: subtask.updated_at || new Date(),
-                });
-            }));
-        }
-
         const response = await httpRequest.del(`/tasks/${taskId}`);
         return response;
     } catch (error) {
-        console.error('Error deleting task:', error);
-        throw new Error('Error deleting task: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
@@ -70,37 +70,40 @@ export const getTaskById = async (taskId) => {
         const response = await httpRequest.get(`/tasks/${taskId}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching task by ID:', error);
-        throw new Error('Error fetching task by ID: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
 export const getStatusTask = async () => {
-    return [
-        { id: 1, name: 'To Do' },
-        { id: 2, name: 'In Progress' },
-        { id: 3, name: 'Completed' }
-    ];
-    // try {
-    //     const response = await httpRequest.get('/status');
-    //     return response.data;
-    // } catch (error) {
-    //     console.error('Error fetching status:', error);
-    //     throw new Error('Error fetching status: ' + error.message);
-    // }
+    // return [
+    //     { id: 1, name: 'To Do' },
+    //     { id: 2, name: 'In Progress' },
+    //     { id: 3, name: 'Completed' }
+    // ];
+    try {
+        const response = await httpRequest.get('/tasks/status');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching status:', error);
+        throw new Error('Error fetching status: ' + error.message);
+    }
 } 
 
 export const getPriorityTask = async () => {
-    return [
-        { id: 1, name: 'Low' },
-        { id: 2, name: 'Medium' },
-        { id: 3, name: 'High' }
-    ];
-    // try {
-    //     const response = await httpRequest.get('/priority');
-    //     return response.data;
-    // } catch (error) {
-    //     console.error('Error fetching priority:', error);
-    //     throw new Error('Error fetching priority: ' + error.message);
-    // }
+    // return [
+    //     { id: 1, name: 'Low' },
+    //     { id: 2, name: 'Medium' },
+    //     { id: 3, name: 'High' }
+    // ];
+    try {
+        const response = await httpRequest.get('/tasks/priority');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching priority:', error);
+        throw new Error('Error fetching priority: ' + error.message);
+    }
 }

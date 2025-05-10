@@ -60,8 +60,8 @@ const Task = () => {
     const filteredTasks = allTasks.filter(task => {
         return (
             task.task_name.toLowerCase().includes(search.toLowerCase()) &&
-            (statusFilter ? task.status === statusFilter : true) &&
-            (priorityFilter ? task.priority === priorityFilter : true)
+            (statusFilter ? task.status._id === statusFilter : true) &&
+            (priorityFilter ? task.priority._id === priorityFilter : true)
         );
     });
 
@@ -149,7 +149,7 @@ const Task = () => {
                     >
                         <MenuItem value="">All</MenuItem>
                         {statusTask.map((status) => (
-                            <MenuItem key={status.id} value={status.name}>
+                            <MenuItem key={status._id} value={status._id}>
                                 {capitalize(status.name)}
                             </MenuItem>
                         ))}
@@ -164,7 +164,7 @@ const Task = () => {
                     >
                         <MenuItem value="">All</MenuItem>
                         {priorityTask.map((priority) => (
-                            <MenuItem key={priority.id} value={priority.name}>
+                            <MenuItem key={priority._id} value={priority._id}>
                                 {capitalize(priority.name)}
                             </MenuItem>
                         ))}
@@ -175,7 +175,7 @@ const Task = () => {
             <Grid container spacing={2}>
                 {paginatedTasks.length > 0 ? (
                     paginatedTasks.map(task => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={task._id}>
                             <TaskCardWrapper
                                 task={task}
                                 onEdit={handleEditTask}

@@ -22,8 +22,8 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
         ...task,
         extend_date: task.extend_date ? new Date(task.extend_date) : new Date(task.end_date),
     });
-    const [status, setStatus] = useState(task.status);
-    const [priority, setPriority] = useState(task.priority);
+    const [status, setStatus] = useState(task.status._id);
+    const [priority, setPriority] = useState(task.priority._id);
     const [mainTask, setMainTask] = useState(null);
 
     useEffect(() => {
@@ -104,7 +104,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                 <TextField
                     margin="dense"
                     label="Mô tả"
-                    name="description"
+                    name="task_description"
                     fullWidth
                     multiline
                     rows={4}
@@ -117,7 +117,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     value={status}
                     onChange={handleStatusChange}
                     menuitems={useMemo(() => [
-                        ...statusTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                        ...statusTask.map(s => ({ value: s._id, label: capitalize(s.name) })),
                     ], [statusTask])}
                 />
                 <Selection
@@ -126,7 +126,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     value={priority}
                     onChange={handlePriorityChange}
                     menuitems={useMemo(() => [
-                        ...priorityTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                        ...priorityTask.map(s => ({ value: s._id, label: capitalize(s.name) })),
                     ], [priorityTask])}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>

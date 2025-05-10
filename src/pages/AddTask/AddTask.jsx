@@ -38,11 +38,11 @@ const AddTask = () => {
     const [taskDescription, setTaskDescription] = useState('');
     const [mainTasks, setMainTasks] = useState([]);
     const [subTasks, setSubTasks] = useState([]);
-    const [status, setStatus] = useState('To Do');
-    const [priority, setPriority] = useState('Low');
-    const [mainTask, setMainTask] = useState('');
+    const [status, setStatus] = useState('');
+    const [priority, setPriority] = useState('');
+    const [mainTask, setMainTask] = useState(tasks && tasks.length > 0 ? tasks[0]._id : '');
     const [taskType, setTaskType] = useState('main');
-    const [response, setRespone] = useState(null);
+    const [response, setResponse] = useState(null);
     console.log('maintasks: ', mainTasks);
     
     useEffect(() => {
@@ -73,7 +73,7 @@ const AddTask = () => {
     }, [tasks]);
     
     const menuitems = useMemo(() => 
-        mainTasks.map(task => ({ value: task.id, label: task.task_name })),
+        mainTasks.map(task => ({ value: task._id, label: task.task_name })),
         [mainTasks]
     );
 
@@ -89,6 +89,17 @@ const AddTask = () => {
                     end: new Date(),
                 };
             })
+        } else {
+            const selectedTask = mainTasks.find(task => task._id === mainTask);
+            if (selectedTask) {
+                setDateTimeRange((prev) => {
+                    return {
+                        ...prev,
+                        start: new Date(selectedTask.start_date),
+                        end: new Date(selectedTask.end_date),
+                    };
+                });
+            }
         }
     };
 
@@ -105,12 +116,10 @@ const AddTask = () => {
     }, []);
 
     const handleMainTaskChange = useCallback((event) => { 
-        const newValue = event.target.value;
-        if (newValue === mainTask) return; // Nếu không thay đổi thì không set lại
-        
         setMainTask(event.target.value);
+        console.log(mainTask);
 
-        const selectedTask = mainTasks.find((task) => task.id === event.target.value);
+        const selectedTask = mainTasks.find((task) => task._id === event.target.value);
         setDateTimeRange((prev) => {
             // Chỉ cập nhật nếu giá trị mới khác với giá trị hiện tại
             if (
@@ -119,8 +128,8 @@ const AddTask = () => {
             ) {
                 return {
                     ...prev,
-                    start: new Date(selectedTask.start_date).getTime(),
-                    end: new Date(selectedTask.end_date).getTime(),
+                    start: new Date(selectedTask.start_date),
+                    end: new Date(selectedTask.end_date),
                 };
             }
             return prev;
@@ -129,9 +138,9 @@ const AddTask = () => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        console.log(mainTask);
         if (mainTask !== '') {
-            const selectedMainTask = mainTasks.find(task => task.id === mainTask);
+            const selectedMainTask = mainTasks.find(task => task._id === mainTask);
             if (!selectedMainTask) return;
 
             const taskData = {
@@ -139,7 +148,6 @@ const AddTask = () => {
                 subtasks: [
                     ...selectedMainTask.subtasks,
                     {
-                        id: Date.now(),
                         task_name: taskName,
                         task_description: taskDescription,
                         status,
@@ -153,12 +161,30 @@ const AddTask = () => {
             };
             updateTask.mutate(taskData, {
                 onSuccess: () => {
-                    setRespone({
+                    setResponse({
                         status: "success",
                         message: `Thêm subtask "${taskName}" thành công`
                     });
+                    setMainTasks((prev) => {
+                        const updatedMainTasks = prev.map(task => {
+                            if (task._id === mainTask) {
+                                return taskData;
+                            }
+                            return task;
+                        });
+                        return updatedMainTasks;
+                    });
+                
+                    setSubTasks((prev) => [
+                        ...prev,
+                        {
+                            ...taskData.subtasks[taskData.subtasks.length - 1],
+                            maintask: selectedMainTask.task_name,
+                        }
+                    ]);
                 }
             });
+        
         } else {
             const taskData = {
                 userid: user.id,
@@ -174,18 +200,30 @@ const AddTask = () => {
             };
             createTask.mutate(taskData, {
                 onSuccess: () => {
-                    setRespone({
+                    setResponse({
                         status: "success",
                         message: `Thêm task "${taskName}" thành công`
                     });
+                    setMainTasks((prev) => [
+                        ...prev,
+                        {
+                            ...taskData,
+                        }
+                    ]);
                 }
             });
+        
         }
 
         setTaskName('');
         setTaskDescription('');
         setMainTask('');
         setSnackbarOpen(true);
+        setDateTimeRange({
+            start: new Date(),
+            end: new Date(),
+            mode: 'datetime',
+        });
     };
 
     return (
@@ -222,7 +260,7 @@ const AddTask = () => {
                         value={status}
                         onChange={handleStatusChange}
                         menuitems={useMemo(() => [
-                            ...statusTask.map(s => ({ value: s.name, label: capitalize(s.name) })),
+                            ...statusTask.map(s => ({ value: s._id, label: capitalize(s.name) })),
                         ], [statusTask])}
                     />
     
@@ -232,7 +270,7 @@ const AddTask = () => {
                         value={priority}
                         onChange={handlePriorityChange}
                         menuitems={useMemo(() => [
-                            ...priorityTask.map(p => ({ value: p.name, label: capitalize(p.name) })),
+                            ...priorityTask.map(p => ({ value: p._id, label: capitalize(p.name) })),
                         ], [priorityTask])}
                     /> 
     
@@ -280,7 +318,7 @@ const AddTask = () => {
                     tasks={useMemo(() => [
                         ...mainTasks,
                         ...subTasks,
-                    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).splice(0, 5)
                     , [mainTasks, subTasks])} 
                 />
             </Box>

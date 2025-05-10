@@ -1,14 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as taskServices from '../services/taskServices';
-import { useAuth } from '../hooks/auth';
 
 export const useTasks = () => {
-  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['tasks', user?.id],
-    queryFn: () => taskServices.getTasksByUserId(user.id),
-    enabled: !!user?.id,
+    queryKey: ['tasks'],
+    queryFn: () => taskServices.getTasksByUserId(),
+    enabled: true,
     refetchOnWindowFocus: false,
     retry: false,
   });
@@ -29,7 +27,7 @@ export const useUpdateTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (task) => taskServices.updateTask(task.id, task),
+    mutationFn: (task) => taskServices.updateTask(task._id, task),
     onSuccess: () => {
       queryClient.invalidateQueries(['tasks']);
     },

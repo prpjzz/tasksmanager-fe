@@ -1,23 +1,28 @@
 import * as httpRequest from '../utils/httpRequest';
 
-export const getSchedulesByUserId = async (userId) => {
+export const getSchedulesByUserId = async () => {
     try {
-        const response = await httpRequest.get('/schedules');
-        const userSchedules = response.data.filter(schedule => schedule.userid === userId);
-        return userSchedules;
+        const response = await httpRequest.get('/schedules/me');
+        return response.data;
     } catch (error) {
-        console.error('Error fetching schedules by user ID:', error);
-        throw new Error('Error fetching schedules by user ID: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
 export const createSchedule = async (schedule) => {
     try {
-        const response = await httpRequest.post('/schedules', schedule);
+        const response = await httpRequest.post('/schedules/create', schedule);
         return response.data;
     } catch (error) {
-        console.error('Error creating schedule:', error);
-        throw new Error('Error creating schedule: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
@@ -26,7 +31,10 @@ export const updateSchedule = async (scheduleId, updatedSchedule) => {
         const response = await httpRequest.put(`/schedules/${scheduleId}`, updatedSchedule);
         return response.data;
     } catch (error) {
-        console.error('Error updating schedule:', error);
-        throw new Error('Error updating schedule: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }

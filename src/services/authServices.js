@@ -3,39 +3,37 @@ import * as httpRequest from '../utils/httpRequest';
 const authKey = 'AUTH_KEY';
 
 export const saveUser = (user) => {
-    localStorage.setItem(authKey, JSON.stringify(user));
+    localStorage.setItem(authKey, user);
 }
 
 export const login = async (email, password) => {
     try {
         const res = await httpRequest.post('/auth/login', { email, password });
-        if (res.status === 400) {
-            throw new Error('Error: ' + res.data.message);
-        } else {
-            saveUser(res.data.token);
-            return res.data.token;
-        }
+        saveUser(res.data.token);
+        return res.data.token;
     } catch (error) {
-        console.error('Error logging in:', error);
-        throw new Error('Error logging in: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
 export const register = async (user) => {
     try {
-        const res = await httpRequest.post('/auth/register', user);
-        if (res.status === 400) {
-            throw new Error('Error: ' + res.data.message);
-        }
+        await httpRequest.post('/auth/register', user);
     } catch (error) {
-        console.error('Error registering:', error);
-        throw new Error('Error registering: ' + error.message);
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
 
 export const logout = () => {
     localStorage.removeItem(authKey);
-    console.log('User logged out successfully');
 }
 
 export const getCurrentUser = () => {

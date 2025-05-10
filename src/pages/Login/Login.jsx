@@ -84,10 +84,6 @@ export default function SignIn() {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
 
     try {
       await user.login(data.get('email'), data.get('password'));
