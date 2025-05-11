@@ -40,7 +40,7 @@ const AddTask = () => {
     const [subTasks, setSubTasks] = useState([]);
     const [status, setStatus] = useState('');
     const [priority, setPriority] = useState('');
-    const [mainTask, setMainTask] = useState(tasks && tasks.length > 0 ? tasks[0]._id : '');
+    const [mainTask, setMainTask] = useState(null);
     const [taskType, setTaskType] = useState('main');
     const [response, setResponse] = useState(null);
     console.log('maintasks: ', mainTasks);
@@ -82,6 +82,7 @@ const AddTask = () => {
         setTaskType(e.target.value);
 
         if (e.target.value === 'main') {
+            setMainTask(null);
             setDateTimeRange((prev) => {
                 return {
                     ...prev,
@@ -116,7 +117,9 @@ const AddTask = () => {
     }, []);
 
     const handleMainTaskChange = useCallback((event) => { 
-        setMainTask(event.target.value);
+        const mainTask = mainTasks.find((task) => task._id === event.target.value);
+        if (!mainTask) return;
+        setMainTask(mainTask);
         console.log(mainTask);
 
         const selectedTask = mainTasks.find((task) => task._id === event.target.value);
@@ -139,10 +142,10 @@ const AddTask = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(mainTask);
-        if (mainTask !== '') {
-            const selectedMainTask = mainTasks.find(task => task._id === mainTask);
+        if (mainTask !== null) {
+            const selectedMainTask = mainTasks.find(task => task._id === mainTask._id);
             if (!selectedMainTask) return;
-
+            console.log('selectedMainTask: ', selectedMainTask);
             const taskData = {
                 ...selectedMainTask,
                 subtasks: [
@@ -154,8 +157,8 @@ const AddTask = () => {
                         priority,
                         start_date: dateTimeRange.start,
                         end_date: dateTimeRange.end,
-                        created_at: new Date(),
-                        updated_at: new Date(),
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
                     }
                 ],
             };
@@ -182,6 +185,12 @@ const AddTask = () => {
                             maintask: selectedMainTask.task_name,
                         }
                     ]);
+                },
+                onError: (error) => {
+                    setResponse({
+                        status: "error",
+                        message: error.response.data.message
+                    });
                 }
             });
         
@@ -195,8 +204,6 @@ const AddTask = () => {
                 start_date: dateTimeRange.start,
                 end_date: dateTimeRange.end,
                 subtasks: [],
-                created_at: new Date(),
-                updated_at: new Date(),
             };
             createTask.mutate(taskData, {
                 onSuccess: () => {
@@ -210,14 +217,21 @@ const AddTask = () => {
                             ...taskData,
                         }
                     ]);
+                },
+                onError: (error) => {
+                    setResponse({
+                        status: "error",
+                        message: error.response.data.message
+                    });
                 }
             });
-        
         }
 
         setTaskName('');
         setTaskDescription('');
-        setMainTask('');
+        setMainTask(null);
+        setStatus('');
+        setPriority('');
         setSnackbarOpen(true);
         setDateTimeRange({
             start: new Date(),
@@ -290,7 +304,7 @@ const AddTask = () => {
                         <Selection
                             title="Chọn task chính"
                             name="mainTask"
-                            value={mainTask}
+                            value={mainTask?._id || ''}
                             onChange={handleMainTaskChange}
                             menuitems={menuitems}
                         />

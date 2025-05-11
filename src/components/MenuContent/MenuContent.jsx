@@ -23,6 +23,7 @@ const mainListItems = [
   { text: 'Add Task', icon: <AddTaskIcon />, path: '/add-task' },
   { text: 'Add Schedule', icon: <ScheduleIcon />, path: '/add-schedule' },
   { text: 'Todos', icon: <FormatListBulletedIcon />, path: '/todos' },
+  { text: 'Schedules', icon: <ScheduleIcon />, path: '/schedules' },
   { text: 'Tasks', icon: <AssignmentRoundedIcon />, path: '/tasks' },
   { text: 'Tasks Completed', icon: <ChecklistIcon />, path: '/tasks-completed' },
   { text: 'Tasks Incompleted', icon: <RemoveDoneIcon />, path: '/tasks-incompleted' },

@@ -39,7 +39,7 @@ const Task = () => {
                 const tmp = (task.subtasks || []).map(subtask => ({
                     ...subtask,
                     maintask: task.task_name,
-                    maintask_id: task.id,
+                    maintask_id: task._id,
                 }));
                 acc.push(...tmp);
                 return acc;
@@ -95,10 +95,10 @@ const Task = () => {
 
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
-            const mainTask = tasks.find(t => t.id === task.maintask_id);
+            const mainTask = tasks.find(t => t._id === task.maintask_id);
             if (mainTask) {
                 // Xóa subtask khỏi maintask
-                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask.id !== task.id);
+                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask._id !== task._id);
 
                 // Update lại maintask
                 updateTask.mutate({
@@ -116,7 +116,7 @@ const Task = () => {
             }
         } else {
             // Nếu là task chính thì xóa
-            deleteTask.mutate(task.id, {
+            deleteTask.mutate(task._id, {
                 onSuccess: () => {
                     setSnackbarMessage(`Đã xoá task "${task.task_name}"`);
                 },
