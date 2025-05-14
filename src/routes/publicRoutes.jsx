@@ -10,6 +10,7 @@ const Tasks = lazy(() => import("../pages/Tasks"));
 const AddSchedule = lazy(() => import("../pages/AddSchedule"));
 const Todos = lazy(() => import("../pages/Todos"));
 const Schedules = lazy(() => import("../pages/Schedules"));
+const Profile = lazy(() => import("../pages/Profile"));
 
 const publicRoutes = [
   { path: "/", component: Home, layout: DefaultLayout, requiresAuth: true },
@@ -21,6 +22,8 @@ const publicRoutes = [
   { path: "/tasks", component: Tasks, layout: DefaultLayout, requiresAuth: true },
   { path: "/login", component: Login, layout: null, requiresAuth: false },
   { path: "/register", component: Register, layout: null, requiresAuth: false },
+  { path: "/profile", component: Profile, layout: DefaultLayout, requiresAuth: true },
+  { path: "/profile/me", component: Profile, layout: DefaultLayout, requiresAuth: true },
 ];
 
 export default publicRoutes;

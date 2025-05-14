@@ -6,13 +6,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import dayjs from '../../utils/dayjsConfig';
 import moment from 'moment';
 import { useTasks } from '../../hooks/tasks';
 import { useSchedules } from '../../hooks/schedules';
-
-dayjs.extend(isSameOrBefore);
 
 const Home = () => {
     const { data: tasks, isLoading: isLoadingTasks, isFetching: isFetchingTasks } = useTasks();
@@ -27,8 +24,8 @@ const Home = () => {
                 id: `task-${task.id}`,
                 group: `task-${task.id}`,
                 title: task.task_name,
-                start: task.start_date,
-                end: task?.extend_date || task.end_date,
+                start: dayjs(task.start_date).format('YYYY-MM-DDTHH:mm:ss'),
+                end: dayjs(task?.extend_date || task.end_date).format('YYYY-MM-DDTHH:mm:ss'),
                 description: task.task_description,
                 status: task.status,
                 priority: task.priority,
@@ -36,7 +33,7 @@ const Home = () => {
                 backgroundColor: '#4caf50',
                 extendedProps: {
                     taskId: task.id,
-                    extend_date: task?.extend_date || null,
+                    extend_date: dayjs(task?.extend_date || null).format('YYYY-MM-DDTHH:mm:ss'),
                     isExtension: false
                 }
             })) : [];
@@ -120,15 +117,12 @@ const Home = () => {
                     plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     headerToolbar={{
-                        // left: 'prev,next today',
-                        // center: 'title',
-                        // right: 'dayGridMonth,dayGridWeek,dayGridDay',
                         start: 'prev,next today',
                         center: 'title',
                         end: 'dayGridMonth,timeGridWeek,timeGridDay'
                     }}
                     editable={true}
-                    allDaySlot={false}
+                    allDaySlot={true}
                     slotMinTime="06:00:00"
                     slotMaxTime="22:00:00"
                     events={events}

@@ -1,12 +1,18 @@
-import * as React from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import SideMenu from "../../components/SideMenu";
+import TaskNotification from "../../components/TaskNotification";
+import { useAuth } from "../../hooks/auth";
 
 const DefaultLayout = ({ children }) => {
+    const { user } = useAuth();
+
     return (
         <Box sx={{ display: "flex" }}>
+            {/* Task notifications */}
+            <TaskNotification userId={user.id} />
+
             {/* Side menu */}
             <SideMenu />
 

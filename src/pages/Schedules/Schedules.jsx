@@ -7,20 +7,36 @@ import {
     MenuItem,
     Grid,
     Card,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button,
     CardContent,
     IconButton,
     Pagination,
     InputLabel,
-    FormControl
+    FormControl,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSchedules } from '../../hooks/schedules';
+import { useSchedules, useUpdateSchedule, useDeleteSchedule } from '../../hooks/schedules';
+import EditScheduleDialog from '../../components/EditScheduleDialog';
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const Schedules = () => {
     const { data: schedules = [], isLoading, isFetching } = useSchedules();
+    const updateSchedule = useUpdateSchedule();
+    const deleteSchedule = useDeleteSchedule();
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setDeleteOpenDialog] = useState(false);
+    const [response, setResponse] = useState(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDay, setFilterDay] = useState('');
     const [page, setPage] = useState(1);
@@ -31,21 +47,59 @@ const Schedules = () => {
     }
 
     const filteredSchedules = schedules
-            .filter(sch =>
-                sch.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                (filterDay ? sch.days.includes(filterDay) : true)
-            );
+        .filter(sch =>
+            sch.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (filterDay ? sch.days.includes(filterDay) : true)
+        );
 
     const paginatedSchedules = filteredSchedules.slice((page - 1) * pageSize, page * pageSize);
 
     const onEdit = (schedule) => {
         // Handle edit action
+        setSelectedSchedule(schedule);
+        setOpenEditDialog(true);
         console.log('Edit schedule:', schedule);
     }
 
     const onDelete = (schedule) => {
         // Handle delete action
+        setSelectedSchedule(schedule);
+        setDeleteOpenDialog(true);
         console.log('Delete schedule:', schedule);
+    }
+
+    const handleEdit = (updatedSchedule) => {
+        // Handle save action
+        updateSchedule.mutate(updatedSchedule, {
+            onSuccess: () => {
+                setOpenEditDialog(false);
+                setSelectedSchedule(null);
+                setResponse({ success: 'success', message: 'Cập nhật lịch học thành công!' });
+                setSnackbarOpen(true);
+            },
+            onError: (error) => {
+                console.error('Error updating schedule:', error);
+                setResponse({ success: 'error', message: 'Cập nhật lịch học thất bại!' });
+                setSnackbarOpen(true);
+            }
+        });
+    }
+
+    const handleDelete = (schedule) => {
+        // Handle delete action
+        deleteSchedule.mutate(schedule._id, {
+            onSuccess: () => {
+                setDeleteOpenDialog(false);
+                setSelectedSchedule(null);
+                setResponse({ success: 'success', message: 'Xoá lịch học thành công!' });
+                setSnackbarOpen(true);
+            },
+            onError: (error) => {
+                console.error('Error deleting schedule:', error);
+                setResponse({ success: 'error', message: 'Xoá lịch học thất bại!' });
+                setSnackbarOpen(true);
+            }
+        });
     }
 
     return (
@@ -111,6 +165,50 @@ const Schedules = () => {
                     color="primary"
                 />
             </Box>
+
+            <EditScheduleDialog
+                open={openEditDialog}
+                onClose={() => setOpenEditDialog(false)}
+                onSave={(updatedSchedule) => {
+                    handleEdit(updatedSchedule);
+                    setOpenEditDialog(false);
+                }}
+                schedule={selectedSchedule}
+            />
+
+            {/* Hộp thoại xác nhận xoá */}
+            {openDeleteDialog && (
+                <Dialog open={openDeleteDialog} onClose={() => setDeleteOpenDialog(false)}>
+                    <DialogTitle>Xác nhận xoá</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Bạn có chắc chắn muốn xoá lịch học "{selectedSchedule.title}"?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setDeleteOpenDialog(false)}>Huỷ</Button>
+                        <Button
+                            onClick={() => handleDelete(selectedSchedule)}
+                            color="error"
+                            variant="contained"
+                        >
+                            Xoá
+                        </Button>
+                    </DialogActions>
+                </Dialog>)}
+
+            {response && (
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={() => setSnackbarOpen(false)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert onClose={() => setSnackbarOpen(false)} severity={response.success} variant="filled">
+                        {response.message}
+                    </Alert>
+                </Snackbar>
+            )}
         </Box>
     );
 };

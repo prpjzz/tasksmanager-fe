@@ -104,7 +104,7 @@ const AddSchedule = () => {
 				</FormGroup>
 
 				<Grid container spacing={2} sx={{ mt: 1 }}>
-					<Grid item xs={6}>
+					<Grid xs={6}>
 						<TextField
 							label="Giờ bắt đầu"
 							type="time"
@@ -116,7 +116,7 @@ const AddSchedule = () => {
 							required
 						/>
 					</Grid>
-					<Grid item xs={6}>
+					<Grid xs={6}>
 						<TextField
 							label="Giờ kết thúc"
 							type="time"

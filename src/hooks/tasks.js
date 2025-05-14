@@ -44,3 +44,25 @@ export const useDeleteTask = () => {
     },
   });
 }
+
+export const useUpdateTaskComplete = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (task) => taskServices.updateTaskComplete(task._id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['tasks']);
+    },
+  });
+}
+
+export const useUpdateSubtaskComplete = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (task) => taskServices.updateSubtaskComplete(task._id, task.maintask_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['tasks']);
+    },
+  });
+}

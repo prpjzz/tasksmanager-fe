@@ -68,7 +68,7 @@ export default function OptionsMenu() {
       >
         <MenuItem 
           component={Link}
-          to="/profile"
+          to="/profile/me"
         >Profile</MenuItem>
         <MenuItem 
           component={Link}

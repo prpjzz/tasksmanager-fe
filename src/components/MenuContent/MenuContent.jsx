@@ -62,8 +62,13 @@ export default function MenuContent() {
       </List>
       <List dense>
         {secondaryListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton>
+          <ListItem
+              key={index}
+              component={LinkBehavior}
+              to={item.path}
+              disablePadding
+              sx={{ display: 'block' }}>
+            <ListItemButton selected={location.pathname === item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

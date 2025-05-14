@@ -26,7 +26,18 @@ export const useUpdateSchedule = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (schedule) => scheduleServices.updateSchedule(schedule.id, schedule),
+    mutationFn: (schedule) => scheduleServices.updateSchedule(schedule._id, schedule),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['schedules']);
+    },
+  });
+}
+
+export const useDeleteSchedule = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (scheduleId) => scheduleServices.deleteSchedule(scheduleId),
     onSuccess: () => {
       queryClient.invalidateQueries(['schedules']);
     },

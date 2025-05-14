@@ -38,3 +38,16 @@ export const updateSchedule = async (scheduleId, updatedSchedule) => {
         }
     }
 }
+
+export const deleteSchedule = async (scheduleId) => {
+    try {
+        const response = await httpRequest.del(`/schedules/${scheduleId}`);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+    }
+}

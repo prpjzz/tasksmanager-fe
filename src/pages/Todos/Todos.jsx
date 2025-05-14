@@ -1,22 +1,21 @@
-// Todos.jsx (dùng MUI + mutation update status)
 import React from 'react';
 import { useTasks } from '../../hooks/tasks';
-import dayjs from 'dayjs';
+import { useUpdateTaskComplete, useUpdateSubtaskComplete } from '../../hooks/tasks';
+import dayjs from '../../utils/dayjsConfig';
 import {
     Box,
     Typography,
     Card,
     CardContent,
     Grid,
-    Chip,
     Button
 } from '@mui/material';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import * as taskServices from '../../services/taskServices';
 
 const TaskCard = ({ task, onComplete }) => {
-    const isOverdue = dayjs(task?.extend_date || task.end_date).isBefore(dayjs());
-    const isSoon = dayjs(task?.extend_date || task.end_date).diff(dayjs(), 'day') <= 3 && !isOverdue;
+    const taskDate = dayjs(task.end_date).tz();
+    const now = dayjs().tz();
+    const isOverdue = taskDate.isBefore(now);
+    const isSoon = taskDate.diff(now, 'day') <= 3 && !isOverdue;
 
     return (
         <Card
@@ -40,7 +39,7 @@ const TaskCard = ({ task, onComplete }) => {
                     {task.task_description}
                 </Typography>
                 <Typography variant="caption">
-                    Hạn: {dayjs(task.end_date).format('DD/MM/YYYY')}
+                    Hạn: {taskDate.format('DD/MM/YYYY HH:mm')}
                 </Typography>
                 {task.maintask_name && (
                     <Typography variant="caption" display="block" color="text.secondary">
@@ -67,25 +66,31 @@ const TaskSection = ({ title, tasks, onComplete }) => (
     </Box>
 );
 
-const Todos = () => {
+const TodosPage = () => {
     const { data: tasks = [], isLoading } = useTasks();
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ id, status }) => taskServices.updateTaskStatus(id, status),
-        onSuccess: () => {
-            queryClient.invalidateQueries(['tasks']);
-        },
-    });
-
-    const completedStatusId = 'your_completed_status_id_here'; // thay bằng ObjectId thật
+    const updateTaskComplete = useUpdateTaskComplete();
+    const updateSubtaskComplete = useUpdateSubtaskComplete();
 
     const handleComplete = (task) => {
-        mutation.mutate({ id: task._id || task.id, status: completedStatusId });
+        if (task.maintask_id) {
+            updateSubtaskComplete.mutate(task, {
+                onSuccess: () => {
+                    alert(`Đã hoàn thành công việc phụ ${task.task_name} của ${task.maintask_name}`);
+                }
+            });
+        } else {
+            updateTaskComplete.mutate(task, {
+                onSuccess: () => {
+                    alert(`Đã hoàn thành công việc ${task.task_name}`);
+                }
+            });
+        }
     };
 
-    const today = dayjs();
-    const upcoming = today.add(3, 'day');
+    const now = dayjs().tz();
+    const startOfToday = now.startOf('day');
+    const endOfToday = now.endOf('day');
+    const endOfSoon = now.add(3, 'day').endOf('day');
 
     const allSubtasks = tasks.flatMap(task =>
         task.subtasks?.map(sub => ({
@@ -95,16 +100,19 @@ const Todos = () => {
         })) || []
     );
     const allTasks = [...tasks, ...allSubtasks];
-    
+
     const todayTasks = allTasks.filter(task =>
-        dayjs(task.end_date).isSame(today, 'day')
+        dayjs(task.start_date).tz().isAfter(startOfToday) &&
+        dayjs(task.start_date).tz().isBefore(endOfToday) &&
+        task.status?.name === 'In Progress'
     );
     const upcomingTasks = allTasks.filter(task =>
-        dayjs(task.end_date).isAfter(today, 'day') &&
-        dayjs(task.end_date).isBefore(upcoming, 'day')
+        dayjs(task?.extend_date || task?.end_date).tz().isAfter(endOfToday) &&
+        dayjs(task?.extend_date || task?.end_date).tz().isBefore(endOfSoon) &&
+        task.status?.name === 'In Progress'
     );
     const overdueTasks = allTasks.filter(task =>
-        dayjs(task.end_date).isBefore(today, 'day') && task.status?.name !== 'Hoàn thành'
+        dayjs(task?.extend_date || task?.end_date).tz().isBefore(startOfToday) && task.status?.name === 'Overdue'
     );
 
     return (
@@ -127,4 +135,4 @@ const Todos = () => {
     );
 };
 
-export default Todos;
+export default TodosPage;

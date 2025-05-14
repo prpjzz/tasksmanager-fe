@@ -12,6 +12,7 @@ import {
 } from "../../services/authServices";
 import Context from "./Context";
 import * as userServices from "../../services/userServices";
+import LoadingDialog from "../../components/LoadingDialog";
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingDialog open={loading} />;
     }
 
     return (

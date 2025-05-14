@@ -79,11 +79,6 @@ export const getTaskById = async (taskId) => {
 }
 
 export const getStatusTask = async () => {
-    // return [
-    //     { id: 1, name: 'To Do' },
-    //     { id: 2, name: 'In Progress' },
-    //     { id: 3, name: 'Completed' }
-    // ];
     try {
         const response = await httpRequest.get('/tasks/status');
         return response.data;
@@ -94,16 +89,53 @@ export const getStatusTask = async () => {
 } 
 
 export const getPriorityTask = async () => {
-    // return [
-    //     { id: 1, name: 'Low' },
-    //     { id: 2, name: 'Medium' },
-    //     { id: 3, name: 'High' }
-    // ];
     try {
         const response = await httpRequest.get('/tasks/priority');
         return response.data;
     } catch (error) {
         console.error('Error fetching priority:', error);
         throw new Error('Error fetching priority: ' + error.message);
+    }
+}
+
+// Lấy thống kê task
+export const getTaskStatistics = async () => {
+    try {
+        const response = await httpRequest.get('/tasks/stats');
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+    }
+}
+
+// Cập nhật trạng thái hoàn thành của task
+export const updateTaskComplete= async (taskId) => {
+    try {
+        const response = await httpRequest.put(`/tasks/${taskId}/complete`);
+        return response;
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+    }
+}
+
+// Cập nhật trạng thái hoàn thành của subtask
+export const updateSubTaskComplete = async (taskId, subTaskId) => {
+    try {
+        const response = await httpRequest.put(`/tasks/${taskId}/subtasks/${subTaskId}/complete`);
+        return response;
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     }
 }
