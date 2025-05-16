@@ -32,9 +32,13 @@ export default function OptionsMenu() {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -72,7 +76,7 @@ export default function OptionsMenu() {
         >Profile</MenuItem>
         <MenuItem 
           component={Link}
-          to="/settings"
+          to="/account-setting"
         >My account</MenuItem>
         <Divider />
         <MenuItem

@@ -11,6 +11,7 @@ const AddSchedule = lazy(() => import("../pages/AddSchedule"));
 const Todos = lazy(() => import("../pages/Todos"));
 const Schedules = lazy(() => import("../pages/Schedules"));
 const Profile = lazy(() => import("../pages/Profile"));
+const AccountSetting = lazy(() => import("../pages/AccountSetting"));
 
 const publicRoutes = [
   { path: "/", component: Home, layout: DefaultLayout, requiresAuth: true },
@@ -24,6 +25,7 @@ const publicRoutes = [
   { path: "/register", component: Register, layout: null, requiresAuth: false },
   { path: "/profile", component: Profile, layout: DefaultLayout, requiresAuth: true },
   { path: "/profile/me", component: Profile, layout: DefaultLayout, requiresAuth: true },
+  { path: "/account-setting", component: AccountSetting, layout: DefaultLayout, requiresAuth: true },
 ];
 
 export default publicRoutes;

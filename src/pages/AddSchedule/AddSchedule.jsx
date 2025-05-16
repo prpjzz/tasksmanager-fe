@@ -48,7 +48,7 @@ const AddSchedule = () => {
 
 		const newSchedule = {
 			title,
-			userid: user.id,
+			userid: user._id,
 			days: selectedDays,
 			startTime,
 			endTime,

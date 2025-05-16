@@ -11,7 +11,7 @@ const DefaultLayout = ({ children }) => {
     return (
         <Box sx={{ display: "flex" }}>
             {/* Task notifications */}
-            <TaskNotification userId={user.id} />
+            <TaskNotification userId={user._id} />
 
             {/* Side menu */}
             <SideMenu />

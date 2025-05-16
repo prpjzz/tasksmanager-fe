@@ -10,6 +10,7 @@ import {
     Grid,
     Button
 } from '@mui/material';
+import confetti from 'canvas-confetti';
 
 const TaskCard = ({ task, onComplete }) => {
     const taskDate = dayjs(task.end_date).tz();
@@ -75,13 +76,35 @@ const TodosPage = () => {
         if (task.maintask_id) {
             updateSubtaskComplete.mutate(task, {
                 onSuccess: () => {
-                    alert(`Đã hoàn thành công việc phụ ${task.task_name} của ${task.maintask_name}`);
+                    confetti({
+                        particleCount: 120,
+                        angle: 60,
+                        spread: 90,
+                        origin: { x: 0, y: 0.5 }
+                    });
+                    confetti({
+                        particleCount: 120,
+                        angle: 120,
+                        spread: 90,
+                        origin: { x: 1, y: 0.5 }
+                    });
                 }
             });
         } else {
             updateTaskComplete.mutate(task, {
                 onSuccess: () => {
-                    alert(`Đã hoàn thành công việc ${task.task_name}`);
+                    confetti({
+                        particleCount: 120,
+                        angle: 60,
+                        spread: 90,
+                        origin: { x: 0, y: 0.5 }
+                    });
+                    confetti({
+                        particleCount: 120,
+                        angle: 120,
+                        spread: 90,
+                        origin: { x: 1, y: 0.5 }
+                    });
                 }
             });
         }
@@ -123,13 +146,19 @@ const TodosPage = () => {
             {isLoading ? (
                 <Typography>Đang tải công việc...</Typography>
             ) : (
-                <Grid container spacing={2}>
-                    <Grid xs={12} md={8}>
-                        <TaskSection title="Hôm nay" tasks={todayTasks} onComplete={handleComplete} />
-                        <TaskSection title="Sắp đến hạn (3 ngày tới)" tasks={upcomingTasks} onComplete={handleComplete} />
-                        <TaskSection title="Quá hạn" tasks={overdueTasks} onComplete={handleComplete} />
-                    </Grid>
-                </Grid>
+                <Box
+                    display="grid"
+                    gridTemplateColumns={{
+                        xs: '1fr',
+                        sm: 'repeat(2, 1fr)',
+                        md: 'repeat(3, 1fr)'
+                    }}
+                    gap={2}
+                >
+                    <TaskSection title="Hôm nay" tasks={todayTasks} onComplete={handleComplete} />
+                    <TaskSection title="Sắp đến hạn (3 ngày tới)" tasks={upcomingTasks} onComplete={handleComplete} />
+                    <TaskSection title="Quá hạn" tasks={overdueTasks} onComplete={handleComplete} />
+                </Box>
             )}
         </Box>
     );

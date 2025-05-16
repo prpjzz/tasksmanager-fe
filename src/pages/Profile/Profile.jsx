@@ -93,7 +93,7 @@ const ProfilePage = () => {
                     </Grid>
                 </CardContent>
             </Card>
-            {stats.completed && stats.inProgress && stats.overdue ? (
+            {stats.completed || stats.inProgress || stats.overdue ? (
                 <Box mt={4}>
                     <Typography variant="h6" gutterBottom>Biểu đồ công việc</Typography>
                     <Box maxWidth={400} mx="auto">

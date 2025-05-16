@@ -2,13 +2,11 @@ import {
     useState,
     useEffect,
 } from "react";
-import { jwtDecode } from 'jwt-decode';
 import {
     login,
     logout,
     register,
-    getCurrentUser,
-    saveUser
+    getCurrentUser
 } from "../../services/authServices";
 import Context from "./Context";
 import * as userServices from "../../services/userServices";
@@ -19,24 +17,33 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = getCurrentUser();
-        if (storedUser) {
-            setUser(jwtDecode(storedUser));
-        }
-        setLoading(false);
+        const fetchUser = async () => {
+            try {
+                const response = await getCurrentUser();
+                console.log("Current user:", response);    
+                setUser(response);
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    setUser(null);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchUser();
     }, []);
 
     const handleLogin = async (username, password) => {
         try {
-            const token = await login(username, password);
-            setUser(jwtDecode(token));
+            await login(username, password);
         } catch (error) {
             throw new Error("Login failed: " + error.message);
         }
     };
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         setUser(null);
     };
 
@@ -48,12 +55,15 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const handleSaveUser = (userData) => {
+        setUser(userData);
+    }
+
     const handleUpdateUser = async (updatedUser) => {
         try {
-            const updatedUserData = await userServices.updateUser(user.id, updatedUser);
-            saveUser(updatedUserData);
-            setUser(updatedUserData);
-            return updatedUserData;
+            const updatedUserData = await userServices.updateUser(user._id, updatedUser);
+            setUser(updatedUserData.data);
+            return updatedUserData.data;
         } catch (error) {
             throw new Error("Update failed: " + error.message);
         }
@@ -71,6 +81,7 @@ export const AuthProvider = ({ children }) => {
                 logout: handleLogout,
                 register: handleRegister,
                 updateUser: handleUpdateUser,
+                saveUser: handleSaveUser,
             }}
         >
             {children}

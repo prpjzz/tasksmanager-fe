@@ -5,26 +5,13 @@ const TaskManagerRequest = axios.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
-});
-
-// Thêm token vào headers nếu có
-TaskManagerRequest.interceptors.request.use((config) => {
-	const token = localStorage.getItem("AUTH_KEY");
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`;
-	}
-	return config;
+  	withCredentials: true
 });
 
 // Xử lý lỗi toàn cục
 TaskManagerRequest.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		if (error.response && error.response.status === 401) {
-			// Token hết hạn hoặc không hợp lệ
-			localStorage.removeItem("AUTH_KEY");
-			window.location.href = "/login"; // Chuyển hướng về login
-		}
 		return Promise.reject(error);
 	}
 );

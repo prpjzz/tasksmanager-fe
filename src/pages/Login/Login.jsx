@@ -8,8 +8,6 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
-import Backdrop from '@mui/material/Backdrop';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import Alert from '@mui/material/Alert';
@@ -17,7 +15,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../../components/ForgotPassword';
 import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
-
+import { getCurrentUser } from "../../services/authServices";
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -91,6 +89,10 @@ export default function SignIn() {
 
         try {
             await user.login(data.get('email'), data.get('password'));
+            
+            const response = await getCurrentUser();
+
+            user.saveUser(response);
             setGeneralErrorMessage('');
             navigate('/');
         } catch (error) {
