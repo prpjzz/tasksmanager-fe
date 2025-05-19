@@ -34,11 +34,15 @@ const ProfilePage = () => {
     }, []);
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Container maxWidth="md" sx={{ mt: 4, p: 2 }}>
             <Card>
                 <CardContent>
                     <Box display="flex" alignItems="center" gap={2}>
-                        <Avatar sx={{ width: 64, height: 64 }}>{user.name.charAt(0)}</Avatar>
+                        <Avatar
+                            src={user.avatar || 'https://via.placeholder.com/64'}
+                            alt={user.name}
+                            sx={{ width: 64, height: 64, border: '2px solid #1976d2' }}
+                        />
                         <Box>
                             <Typography variant="h5">{user.name}</Typography>
                             <Typography color="text.secondary">Email: {user.email}</Typography>
