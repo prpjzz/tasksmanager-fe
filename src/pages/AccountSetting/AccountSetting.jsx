@@ -11,23 +11,37 @@ import {
     Box,
 } from '@mui/material';
 import { Visibility, VisibilityOff, PhotoCamera } from '@mui/icons-material';
+import * as userService from "../../services/userServices";
 
 const AccountSettings = () => {
-    const [avatar, setAvatar] = useState(null);
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(null);
     const [name, setName] = useState('Nguyễn Văn A');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setAvatar(URL.createObjectURL(file));
-        }
+        setAvatarFile(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => setAvatarPreview(reader.result);
+        reader.readAsDataURL(file);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        alert('Thông tin đã được cập nhật!');
+        
+        try {
+            const response = await userService.updateUser({
+                name,
+                password,
+                avatar: avatarFile,
+            });
+            alert('Thông tin đã được cập nhật!');
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
     return (
@@ -45,10 +59,12 @@ const AccountSettings = () => {
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} textAlign="center">
-                            <Avatar
-                                src={avatar}
-                                sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
-                            />
+                            {avatarPreview && (
+                                <Avatar
+                                    src={avatarPreview}
+                                    sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
+                                />
+                            )}
                             <input
                                 accept="image/*"
                                 id="upload-avatar"
