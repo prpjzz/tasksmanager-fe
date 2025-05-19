@@ -10,10 +10,9 @@ import {
     FormControlLabel,
     Radio,
     Divider,
-    Snackbar,
-    Alert,
     capitalize
 } from '@mui/material';
+import SnackbarAlert from '../../components/SnackbarAlert';
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
 import Selection from '../../components/Form/Selection';
 import ListTasks from '../../components/ListTasks';
@@ -43,7 +42,6 @@ const AddTask = () => {
     const [mainTask, setMainTask] = useState(null);
     const [taskType, setTaskType] = useState('main');
     const [response, setResponse] = useState(null);
-    console.log('maintasks: ', mainTasks);
     
     useEffect(() => {
         const fetchMainTasks = () => {
@@ -338,16 +336,11 @@ const AddTask = () => {
             </Box>
             
             {response && (
-                <Snackbar
+                <SnackbarAlert
                     open={snackbarOpen}
-                    autoHideDuration={3000}
                     onClose={() => setSnackbarOpen(false)}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                >
-                    <Alert onClose={() => setSnackbarOpen(false)} severity={response.success} variant="filled">
-                        {response.message}
-                    </Alert>
-                </Snackbar>
+                    response={response}
+                />
             )}
         </Box>
     );

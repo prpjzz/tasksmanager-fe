@@ -11,6 +11,7 @@ import {
 	Grid,
 	Box,
 } from "@mui/material";
+import SnackbarAlert from "../../components/SnackbarAlert";
 import { useAuth } from "../../hooks/auth";
 import { useCreateSchedule } from "../../hooks/schedules";
 
@@ -32,6 +33,8 @@ const AddSchedule = () => {
 	const [startTime, setStartTime] = useState("");
 	const [endTime, setEndTime] = useState("");
 	const [repeat, setRepeat] = useState("weekly");
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+	const [response, setResponse] = useState({});
 
 	const handleDayChange = (day) => {
 		setSelectedDays((prev) =>
@@ -57,7 +60,11 @@ const AddSchedule = () => {
 		console.log("New Schedule:", newSchedule);
 		createSchedule.mutate(newSchedule, {
 			onSuccess: () => {
-				alert("Thêm lịch học thành công");
+				setResponse({
+					status: "success",
+					message: "Thêm lịch học thành công",
+				});
+				setSnackbarOpen(true);
 				setTitle("");
 				setSelectedDays([]);
 				setStartTime("");
@@ -65,7 +72,11 @@ const AddSchedule = () => {
 				setRepeat("weekly");
 			},
 			onError: (error) => {
-				alert("Có lỗi xảy ra: " + error.message);
+				setResponse({
+					status: "error",
+					message: "Có lỗi xảy ra: " + error.message,
+				});
+				setSnackbarOpen(true);
 			},
 		});
 	};
@@ -152,6 +163,14 @@ const AddSchedule = () => {
 					Thêm Lịch Học
 				</Button>
 			</Box>
+
+			{response.message && (
+				<SnackbarAlert
+					open={snackbarOpen}
+					onClose={() => setSnackbarOpen(false)}
+					response={response}
+				/>
+			)}
 		</Container>
 	);
 };

@@ -11,14 +11,19 @@ import {
     Box,
 } from '@mui/material';
 import { Visibility, VisibilityOff, PhotoCamera } from '@mui/icons-material';
+import SnackbarAlert from '../../components/SnackbarAlert';
+import { useAuth } from '../../hooks/auth';
 import * as userService from "../../services/userServices";
 
 const AccountSettings = () => {
+    const { user, saveUser } = useAuth();
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
-    const [name, setName] = useState('Nguyễn Văn A');
+    const [name, setName] = useState(user.name);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [response, setResponse] = useState({});
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
@@ -31,16 +36,56 @@ const AccountSettings = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
-            const response = await userService.updateUser({
-                name,
-                password,
-                avatar: avatarFile,
-            });
-            alert('Thông tin đã được cập nhật!');
+            if (avatarFile) {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64String = reader.result;
+                    const updatedUser = {
+                        name,
+                        password,
+                        avatar: base64String,
+                    };
+
+                    const response = await userService.updateUser(updatedUser);
+                    if (response) {
+                        setResponse({
+                            status: 'success',
+                            message: 'Cập nhật thành công',
+                        });
+                        setSnackbarOpen(true);
+                        saveUser({ ...user, ...updatedUser });
+                    }
+                };
+                reader.readAsDataURL(avatarFile);
+            } else {
+                const updatedUser = {
+                    name,
+                    password,
+                };
+
+                const response = await userService.updateUser(updatedUser);
+                if (response) {
+                    setResponse({
+                        status: 'success',
+                        message: 'Cập nhật thành công',
+                    });
+                    setSnackbarOpen(true);
+                    saveUser({ ...user, ...updatedUser });
+                }
+            }
         } catch (error) {
-            alert(error.message);
+            setResponse({
+                status: 'error',
+                message: 'Cập nhật thất bại',
+            });
+            setSnackbarOpen(true);
+        } finally {
+            setAvatarFile(null);
+            setAvatarPreview(null);
+            setName(user.name);
+            setPassword('');
         }
     };
 
@@ -59,9 +104,13 @@ const AccountSettings = () => {
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} textAlign="center">
-                            {avatarPreview && (
+                            {avatarPreview || user.avatar ? (
                                 <Avatar
-                                    src={avatarPreview}
+                                    src={avatarPreview || user.avatar}
+                                    sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
+                                />
+                            ) : (
+                                <Avatar
                                     sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
                                 />
                             )}
@@ -137,6 +186,14 @@ const AccountSettings = () => {
                     </Grid>
                 </form>
             </Paper>
+
+            {response.message && (
+                <SnackbarAlert
+                    snackbarOpen={snackbarOpen}
+                    onClose={() => setSnackbarOpen(false)}
+                    response={response}
+                />
+            )}
         </Box>
     );
 };

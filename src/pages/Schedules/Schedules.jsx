@@ -18,11 +18,10 @@ import {
     Pagination,
     InputLabel,
     FormControl,
-    Snackbar,
-    Alert
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SnackbarAlert from '../../components/SnackbarAlert';
 import { useSchedules, useUpdateSchedule, useDeleteSchedule } from '../../hooks/schedules';
 import EditScheduleDialog from '../../components/EditScheduleDialog';
 
@@ -34,7 +33,7 @@ const Schedules = () => {
     const deleteSchedule = useDeleteSchedule();
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setDeleteOpenDialog] = useState(false);
-    const [response, setResponse] = useState(null);
+    const [response, setResponse] = useState({});
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -74,15 +73,14 @@ const Schedules = () => {
             onSuccess: () => {
                 setOpenEditDialog(false);
                 setSelectedSchedule(null);
-                setResponse({ success: 'success', message: 'Cập nhật lịch học thành công!' });
-                setSnackbarOpen(true);
+                setResponse({ status: 'success', message: 'Cập nhật lịch học thành công!' });
             },
             onError: (error) => {
                 console.error('Error updating schedule:', error);
-                setResponse({ success: 'error', message: 'Cập nhật lịch học thất bại!' });
-                setSnackbarOpen(true);
+                setResponse({ status: 'error', message: 'Cập nhật lịch học thất bại!' });
             }
         });
+        setSnackbarOpen(true);
     }
 
     const handleDelete = (schedule) => {
@@ -91,15 +89,14 @@ const Schedules = () => {
             onSuccess: () => {
                 setDeleteOpenDialog(false);
                 setSelectedSchedule(null);
-                setResponse({ success: 'success', message: 'Xoá lịch học thành công!' });
-                setSnackbarOpen(true);
+                setResponse({ status: 'success', message: 'Xoá lịch học thành công!' });
             },
             onError: (error) => {
                 console.error('Error deleting schedule:', error);
-                setResponse({ success: 'error', message: 'Xoá lịch học thất bại!' });
-                setSnackbarOpen(true);
+                setResponse({ status: 'error', message: 'Xoá lịch học thất bại!' });
             }
         });
+        setSnackbarOpen(true);
     }
 
     return (
@@ -197,17 +194,12 @@ const Schedules = () => {
                     </DialogActions>
                 </Dialog>)}
 
-            {response && (
-                <Snackbar
+            {response.message && (
+                <SnackbarAlert
                     open={snackbarOpen}
-                    autoHideDuration={3000}
                     onClose={() => setSnackbarOpen(false)}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                >
-                    <Alert onClose={() => setSnackbarOpen(false)} severity={response.success} variant="filled">
-                        {response.message}
-                    </Alert>
-                </Snackbar>
+                    response={response}
+                />
             )}
         </Box>
     );

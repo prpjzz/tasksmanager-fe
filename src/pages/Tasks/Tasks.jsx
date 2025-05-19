@@ -10,11 +10,10 @@ import {
     Stack,
     Typography,
     Grid,
-    Snackbar,
-    Alert,
     capitalize
 } from '@mui/material';
 import TaskCardWrapper from './TaskCardWrapper';
+import SnackbarAlert from '../../components/SnackbarAlert';
 import { useTasks, useUpdateTask, useDeleteTask } from '../../hooks/tasks';
 import { useStatusPriority } from '../../hooks/status-priority';
 
@@ -26,7 +25,7 @@ const Task = () => {
     
     const [allTasks, setAllTasks] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [response, setResponse] = useState({});
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [priorityFilter, setPriorityFilter] = useState('');
@@ -78,21 +77,23 @@ const Task = () => {
 
         updateTask.mutate(task, {
             onSuccess: () => {
-                setSnackbarMessage(`Đã cập nhật task "${task.task_name}"`);
+                setResponse({
+                    status: 'success',
+                    message: `Đã cập nhật task "${task.task_name}"`,
+                });
                 setSnackbarOpen(true);
             },
             onError: (error) => {
-                setSnackbarMessage(`Lỗi khi cập nhật task "${task.task_name}"`);
-                console.error('Error updating task:', error);
+                setResponse({
+                    status: 'error',
+                    message: `Lỗi khi cập nhật task "${task.task_name}"`,
+                });
                 setSnackbarOpen(true);
             }
         });
     };
 
     const handleDeleteTask = async (task) => {
-        // Logic to delete task
-        console.log('Delete task:', task);
-
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
             const mainTask = tasks.find(t => t._id === task.maintask_id);
@@ -106,11 +107,16 @@ const Task = () => {
                     subtasks: updatedSubtasks,
                 }, {
                     onSuccess: () => {
-                        setSnackbarMessage(`Đã xoá subtask "${task.task_name}"`);
+                        setResponse({
+                            status: 'success',
+                            message: `Đã xóa subtask "${task.task_name}"`,
+                        });
                     },
                     onError: (error) => {
-                        setSnackbarMessage(`Lỗi khi xoá subtask "${task.task_name}"`);
-                        console.error('Error deleting subtask:', error);
+                        setResponse({
+                            status: 'error',
+                            message: `Lỗi khi xoá subtask "${task.task_name}"`,
+                        });
                     }
                 });
             }
@@ -118,11 +124,16 @@ const Task = () => {
             // Nếu là task chính thì xóa
             deleteTask.mutate(task._id, {
                 onSuccess: () => {
-                    setSnackbarMessage(`Đã xoá task "${task.task_name}"`);
+                    setResponse({
+                        status: 'success',
+                        message: `Đã xoá task "${task.task_name}"`,
+                    });
                 },
                 onError: (error) => {
-                    setSnackbarMessage(`Lỗi khi xoá task "${task.task_name}"`);
-                    console.error('Error deleting task:', error);
+                    setResponse({
+                        status: 'error',
+                        message: `Lỗi khi xoá task "${task.task_name}"`,
+                    });
                 }
             });
         }
@@ -199,16 +210,13 @@ const Task = () => {
                 />
             </Box>
 
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
+            {response.message && (
+                <SnackbarAlert
+                    open={snackbarOpen}
+                    onClose={() => setSnackbarOpen(false)}
+                    response={response}
+                />
+            )}
 
         </Box>
     );

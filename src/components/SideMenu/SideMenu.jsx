@@ -57,9 +57,9 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
-          src="/static/images/avatar/7.jpg"
-          sx={{ width: 36, height: 36 }}
+          alt={user?.name}
+          src={user?.avatar || "/static/images/avatar/7.jpg"}
+          sx={{ width: 36, height: 36, border: '2px solid', borderColor: 'primary.main' }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
