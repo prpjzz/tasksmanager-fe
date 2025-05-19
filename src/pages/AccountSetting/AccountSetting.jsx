@@ -21,6 +21,7 @@ const AccountSettings = () => {
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [name, setName] = useState(user.name);
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [response, setResponse] = useState({});
@@ -36,6 +37,33 @@ const AccountSettings = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (name === '') {
+            setResponse({
+                status: 'error',
+                message: 'Tên người dùng không được để trống',
+            });
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (password !== '' && password.length < 6) {
+            setResponse({
+                status: 'error',
+                message: 'Mật khẩu phải có ít nhất 6 ký tự',
+            });
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setResponse({
+                status: 'error',
+                message: 'Mật khẩu không khớp',
+            });
+            setSnackbarOpen(true);
+            return;
+        }
 
         try {
             if (avatarFile) {
@@ -54,7 +82,6 @@ const AccountSettings = () => {
                             status: 'success',
                             message: 'Cập nhật thành công',
                         });
-                        setSnackbarOpen(true);
                         saveUser({ ...user, ...updatedUser });
                     }
                 };
@@ -71,7 +98,6 @@ const AccountSettings = () => {
                         status: 'success',
                         message: 'Cập nhật thành công',
                     });
-                    setSnackbarOpen(true);
                     saveUser({ ...user, ...updatedUser });
                 }
             }
@@ -80,12 +106,12 @@ const AccountSettings = () => {
                 status: 'error',
                 message: 'Cập nhật thất bại',
             });
-            setSnackbarOpen(true);
         } finally {
             setAvatarFile(null);
             setAvatarPreview(null);
             setName(user.name);
             setPassword('');
+            setSnackbarOpen(true);
         }
     };
 
@@ -163,6 +189,8 @@ const AccountSettings = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 fullWidth
                                 sx={{ marginTop: 2 }}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
