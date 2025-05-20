@@ -2,7 +2,6 @@ import { lazy } from "react";
 import DefaultLayout from "../layouts/DefaultLayout";
 
 const Home = lazy(() => import("../pages/Home"));
-const Test = lazy(() => import("../pages/Test"));
 const AddTask = lazy(() => import("../pages/AddTask"));
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
@@ -14,6 +13,8 @@ const Profile = lazy(() => import("../pages/Profile"));
 const AccountSetting = lazy(() => import("../pages/AccountSetting"));
 const About = lazy(() => import("../pages/About"));
 const Help = lazy(() => import("../pages/Help"));
+const TasksCompleted = lazy(() => import("../pages/TasksCompleted"));
+const TasksOverdue = lazy(() => import("../pages/TasksOverdue"));
 
 const publicRoutes = [
   { path: "/", component: Home, layout: DefaultLayout, requiresAuth: true },
@@ -21,7 +22,6 @@ const publicRoutes = [
   { path: "/add-schedule", component: AddSchedule, layout: DefaultLayout, requiresAuth: true },
   { path: "/todos", component: Todos, layout: DefaultLayout, requiresAuth: true },
   { path: "/schedules", component: Schedules, layout: DefaultLayout, requiresAuth: true },
-  { path: "/test", component: Test, layout: DefaultLayout, requiresAuth: true },
   { path: "/tasks", component: Tasks, layout: DefaultLayout, requiresAuth: true },
   { path: "/login", component: Login, layout: null, requiresAuth: false },
   { path: "/register", component: Register, layout: null, requiresAuth: false },
@@ -29,7 +29,9 @@ const publicRoutes = [
   { path: "/profile/me", component: Profile, layout: DefaultLayout, requiresAuth: true },
   { path: "/account-setting", component: AccountSetting, layout: DefaultLayout, requiresAuth: true },
   { path: "/about", component: About, layout: DefaultLayout, requiresAuth: true },
-  { path: "/help", component: Help, layout: DefaultLayout, requiresAuth: true }
+  { path: "/help", component: Help, layout: DefaultLayout, requiresAuth: true },
+  { path: "/tasks-completed", component: TasksCompleted, layout: DefaultLayout, requiresAuth: true },
+  { path: "/tasks-overdue", component: TasksOverdue, layout: DefaultLayout, requiresAuth: true },
 ];
 
 export default publicRoutes;

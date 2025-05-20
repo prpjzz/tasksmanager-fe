@@ -12,9 +12,8 @@ function TaskReminderListener({ userId }) {
         // Lắng nghe sự kiện từ server
         socket.on("notification", (data) => {
             console.log("Notification received:", data);
-            const formattedDate = new Date(data.endDate).toLocaleDateString();
             toast.info(
-                `🔔 Task "${data.taskName}" của bạn sắp hết hạn vào ${formattedDate}`,
+                `🔔 ${data.message}`,
                 {
                     position: "top-right",
                     autoClose: 5000,
@@ -28,7 +27,7 @@ function TaskReminderListener({ userId }) {
         };
     }, [userId]);
 
-    return null; // Component không hiển thị gì
+    return <></>; // Component không hiển thị gì
 }
 
 export default TaskReminderListener;

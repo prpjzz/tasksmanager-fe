@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTasks } from '../../hooks/tasks';
 import { useUpdateTaskComplete, useUpdateSubtaskComplete } from '../../hooks/tasks';
 import dayjs from '../../utils/dayjsConfig';
@@ -7,7 +6,6 @@ import {
     Typography,
     Card,
     CardContent,
-    Grid,
     Button
 } from '@mui/material';
 import confetti from 'canvas-confetti';

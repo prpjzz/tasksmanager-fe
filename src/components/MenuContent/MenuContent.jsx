@@ -26,7 +26,7 @@ const mainListItems = [
   { text: 'Schedules', icon: <ScheduleIcon />, path: '/schedules' },
   { text: 'Tasks', icon: <AssignmentRoundedIcon />, path: '/tasks' },
   { text: 'Tasks Completed', icon: <ChecklistIcon />, path: '/tasks-completed' },
-  { text: 'Tasks Incompleted', icon: <RemoveDoneIcon />, path: '/tasks-incompleted' },
+  { text: 'Tasks Overdue', icon: <RemoveDoneIcon />, path: '/tasks-overdue' },
 ];
 
 const secondaryListItems = [
