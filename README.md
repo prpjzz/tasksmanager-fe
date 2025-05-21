@@ -24,7 +24,28 @@
 
 ## Cấu trúc thư mục
 
-. ├── public/ # Tài nguyên tĩnh (favicon, ảnh, ...) ├── src/ │ ├── assets/ # Ảnh, icon dùng trong app │ ├── components/ # Các component dùng chung (CardTask, Dialog, Menu, ...) │ ├── contexts/ # React context (quản lý state toàn cục) │ ├── hooks/ # Custom hooks │ ├── layouts/ # Layout tổng thể │ ├── pages/ # Các trang chính (Home, Tasks, AddTask, Help, ...) │ ├── routes/ # Định tuyến trang │ ├── services/ # Giao tiếp API (taskServices, ...) │ ├── utils/ # Hàm tiện ích, cấu hình socket, ... │ ├── App.jsx # Component gốc │ ├── main.jsx # Điểm khởi tạo ứng dụng │ └── index.css # CSS tổng ├── db.json # (Nếu có) Dữ liệu mẫu cho mock API ├── package.json # Thông tin dự án & dependencies ├── vite.config.js # Cấu hình Vite ├── README.md # Tài liệu này └── .env.development # Biến môi trường (API endpoint, ...)
+```
+.
+├── public/             # Tài nguyên tĩnh (favicon, ảnh, ...)
+├── src/
+│   ├── assets/         # Ảnh, icon dùng trong app
+│   ├── components/     # Các component dùng chung (CardTask, Dialog, Menu, ...)
+│   ├── contexts/       # React context (quản lý state toàn cục)
+│   ├── hooks/          # Custom hooks
+│   ├── layouts/        # Layout tổng thể
+│   ├── pages/          # Các trang chính (Home, Tasks, AddTask, Help, ...)
+│   ├── routes/         # Định tuyến trang
+│   ├── services/       # Giao tiếp API (taskServices, ...)
+│   ├── utils/          # Hàm tiện ích, cấu hình socket, ...
+│   ├── App.jsx         # Component gốc
+│   ├── main.jsx        # Điểm khởi tạo ứng dụng
+│   └── index.css       # CSS tổng
+├── db.json             # (Nếu có) Dữ liệu mẫu cho mock API
+├── package.json        # Thông tin dự án & dependencies
+├── vite.config.js      # Cấu hình Vite
+├── README.md           # Tài liệu này
+└── .env.development   # Biến môi trường (API endpoint, ...)
+```
 
 ## Hướng dẫn cài đặt & chạy dự án
 
