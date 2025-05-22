@@ -196,7 +196,7 @@ const Schedules = () => {
 
             {response.message && (
                 <SnackbarAlert
-                    open={snackbarOpen}
+                    snackbarOpen={snackbarOpen}
                     onClose={() => setSnackbarOpen(false)}
                     response={response}
                 />

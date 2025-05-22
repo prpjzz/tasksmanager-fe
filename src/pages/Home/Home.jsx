@@ -20,7 +20,9 @@ const Home = () => {
 
     useEffect(() => {
         const handleGenerateEvents = (tasks) => {
-            return tasks ? tasks.flatMap((task) => ({
+            const tasksFiltered = tasks.filter(t => t.completed === false || t.status.name === 'Overdue');
+
+            return tasksFiltered ? tasksFiltered.flatMap((task) => ({
                 id: `task-${task.id}`,
                 group: `task-${task.id}`,
                 title: task.task_name,
@@ -33,7 +35,7 @@ const Home = () => {
                 backgroundColor: '#4caf50',
                 extendedProps: {
                     taskId: task.id,
-                    extend_date: dayjs(task?.extend_date || null).format('YYYY-MM-DDTHH:mm:ss'),
+                    extend_date: task?.extend_date ? dayjs(task.extend_date).format('YYYY-MM-DDTHH:mm:ss') : null,
                     isExtension: false
                 }
             })) : [];

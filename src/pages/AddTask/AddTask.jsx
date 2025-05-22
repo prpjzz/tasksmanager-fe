@@ -337,7 +337,7 @@ const AddTask = () => {
             
             {response && (
                 <SnackbarAlert
-                    open={snackbarOpen}
+                    snackbarOpen={snackbarOpen}
                     onClose={() => setSnackbarOpen(false)}
                     response={response}
                 />

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff, PhotoCamera } from '@mui/icons-material';
 import SnackbarAlert from '../../components/SnackbarAlert';
+import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
 import * as userService from "../../services/userServices";
 
@@ -25,6 +26,7 @@ const AccountSettings = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [response, setResponse] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
@@ -65,6 +67,7 @@ const AccountSettings = () => {
             return;
         }
 
+        setLoading(true);
         try {
             if (avatarFile) {
                 const reader = new FileReader();
@@ -87,6 +90,7 @@ const AccountSettings = () => {
                 };
                 reader.readAsDataURL(avatarFile);
             } else {
+
                 const updatedUser = {
                     name,
                     password,
@@ -107,9 +111,9 @@ const AccountSettings = () => {
                 message: 'Cập nhật thất bại',
             });
         } finally {
+            setLoading(false);
             setAvatarFile(null);
             setAvatarPreview(null);
-            setName(user.name);
             setPassword('');
             setSnackbarOpen(true);
         }
@@ -220,6 +224,12 @@ const AccountSettings = () => {
                     snackbarOpen={snackbarOpen}
                     onClose={() => setSnackbarOpen(false)}
                     response={response}
+                />
+            )}
+
+            {loading && (
+                <LoadingDialog
+                    open={loading}
                 />
             )}
         </Box>

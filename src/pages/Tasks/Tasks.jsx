@@ -16,6 +16,7 @@ import TaskCardWrapper from './TaskCardWrapper';
 import SnackbarAlert from '../../components/SnackbarAlert';
 import { useTasks, useUpdateTask, useDeleteTask } from '../../hooks/tasks';
 import { useStatusPriority } from '../../hooks/status-priority';
+import { sortTasks } from '../../utils/sortTasks';
 
 const Task = () => {
     const { statusTask, priorityTask } = useStatusPriority();
@@ -44,7 +45,7 @@ const Task = () => {
                 return acc;
             }, []);
 
-            setAllTasks([...tasks, ...subTasks]);
+            setAllTasks(sortTasks([...tasks, ...subTasks]));
         }
     }, [tasks]);
 
@@ -81,16 +82,16 @@ const Task = () => {
                     status: 'success',
                     message: `Đã cập nhật task "${task.task_name}"`,
                 });
-                setSnackbarOpen(true);
             },
             onError: (error) => {
                 setResponse({
                     status: 'error',
                     message: `Lỗi khi cập nhật task "${task.task_name}"`,
                 });
-                setSnackbarOpen(true);
             }
         });
+
+        setSnackbarOpen(true);
     };
 
     const handleDeleteTask = async (task) => {
@@ -140,7 +141,7 @@ const Task = () => {
 
         setSnackbarOpen(true);
     };
-
+    
     return (
         <Box p={3}>
             <Typography variant="h4" mb={2}>Task Management</Typography>
@@ -210,9 +211,9 @@ const Task = () => {
                 />
             </Box>
 
-            {response.message && (
+            {snackbarOpen && (
                 <SnackbarAlert
-                    open={snackbarOpen}
+                    snackbarOpen={snackbarOpen}
                     onClose={() => setSnackbarOpen(false)}
                     response={response}
                 />

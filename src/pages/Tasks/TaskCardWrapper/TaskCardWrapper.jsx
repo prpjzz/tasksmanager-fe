@@ -106,12 +106,14 @@ const TaskCardWrapper = ({ task, onEdit, onDelete }) => {
 			<CardTask task={task} />
 
 			{/* Hộp thoại sửa task */}
-			<EditTaskDialog
-				open={editOpen}
-				onClose={() => setEditOpen(false)}
-				task={task}
-				onSave={onEdit}
-			/>
+			{editOpen && (
+				<EditTaskDialog
+					open={editOpen}
+					onClose={() => setEditOpen(false)}
+					task={task}
+					onSave={onEdit}
+				/>
+			)}
 		</Box>
 	);
 };
