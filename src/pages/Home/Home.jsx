@@ -20,7 +20,7 @@ const Home = () => {
 
     useEffect(() => {
         const handleGenerateEvents = (tasks) => {
-            const tasksFiltered = tasks.filter(t => t.completed === false || t.status.name === 'Overdue');
+            const tasksFiltered = tasks.filter(t => t.completed === false && t.status.name !== 'Overdue');
 
             return tasksFiltered ? tasksFiltered.flatMap((task) => ({
                 id: `task-${task.id}`,

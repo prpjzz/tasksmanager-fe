@@ -1,13 +1,11 @@
 import * as React from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-import CircularProgress from '@mui/material/CircularProgress';
-import Backdrop from '@mui/material/Backdrop';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
@@ -42,7 +40,6 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         padding: theme.spacing(4),
     },
-    overflowY: 'auto',
     '&::before': {
         content: '""',
         display: 'block',
@@ -62,6 +59,7 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
 export default function Register() {
     const [loading, setLoading] = React.useState(false);
     const [generalErrorMessage, setGeneralErrorMessage] = React.useState('');
+    const [successMessage, setSuccessMessage] = React.useState('');
     const [nameError, setNameError] = React.useState(false);
     const [nameErrorMessage, setNameErrorMessage] = React.useState('');
     const [emailError, setEmailError] = React.useState(false);
@@ -70,7 +68,6 @@ export default function Register() {
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
-    const navigate = useNavigate();
 
     const user = useAuth();
 
@@ -84,17 +81,31 @@ export default function Register() {
         const data = new FormData(event.currentTarget);
 
         try {
-            await user.register({
+            const response = await user.register({
                 name: data.get('name'),
                 email: data.get('email'),
                 password: data.get('password'),
             });
             setGeneralErrorMessage('');
-            navigate('/login');
+            setSuccessMessage(response.message);
         } catch (error) {
             setGeneralErrorMessage(error.message);
         } finally {
             setLoading(false);
+            // clear data form fields
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirmPassword').value = '';
+            setNameError(false);
+            setNameErrorMessage('');
+            setEmailError(false);
+            setEmailErrorMessage('');
+            setPasswordError(false);
+            setPasswordErrorMessage('');
+            setConfirmPasswordError(false);
+            setConfirmPasswordErrorMessage('');
+            setGeneralErrorMessage('');
         }
     };
 
@@ -149,7 +160,7 @@ export default function Register() {
         <>
             <CssBaseline enableColorScheme />
             <RegisterContainer direction="column" justifyContent="space-between">
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ overflowY: 'auto' }}>
                     <Typography
                         component="h1"
                         variant="h4"
@@ -161,6 +172,12 @@ export default function Register() {
                     {generalErrorMessage && (
                         <Alert severity="error">
                             {generalErrorMessage}
+                        </Alert>
+                    )}
+
+                    {successMessage && (
+                        <Alert severity="success">
+                            {successMessage}
                         </Alert>
                     )}
 
@@ -259,6 +276,35 @@ export default function Register() {
                             Have an account? Login
                         </RouterLink>
                     </Box>
+
+                    {/* Login with social media */}
+                    <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ width: '100%' }}
+                    >
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            sx={{ flexGrow: 1, mr: 1 }}
+                            onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+                            }}
+                        >
+                            Login with Google
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            sx={{ flexGrow: 1, ml: 1 }}
+                            onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`;
+                            }}
+                        >
+                            Login with Facebook
+                        </Button>
+                    </Stack>
                 </Card>
             </RegisterContainer>
 

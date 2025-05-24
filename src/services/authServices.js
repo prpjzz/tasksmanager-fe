@@ -14,7 +14,8 @@ export const login = async (email, password) => {
 
 export const register = async (user) => {
     try {
-        await httpRequest.post('/auth/register', user);
+        const response = await httpRequest.post('/auth/register', user);
+        return response.data;
     } catch (error) {
         if (error.response && error.response.data.message) {
             throw new Error(error.response.data.message);

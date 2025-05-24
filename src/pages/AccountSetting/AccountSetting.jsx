@@ -138,6 +138,7 @@ const AccountSettings = () => {
                                 <Avatar
                                     src={avatarPreview || user.avatar}
                                     sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
+                                    alt={user.name}
                                 />
                             ) : (
                                 <Avatar

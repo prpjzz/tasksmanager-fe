@@ -219,6 +219,35 @@ export default function SignIn() {
                             Don't have an account? Sign up
                         </RouterLink>
                     </Box>
+
+                    {/* Login with social media */}
+                    <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ width: '100%' }}
+                    >
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            sx={{ flexGrow: 1, mr: 1 }}
+                            onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+                            }}
+                        >
+                            Login with Google
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            sx={{ flexGrow: 1, ml: 1 }}
+                            onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`;
+                            }}
+                        >
+                            Login with Facebook
+                        </Button>
+                    </Stack>
                 </Card>
             </SignInContainer>
 

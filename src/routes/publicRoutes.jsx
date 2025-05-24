@@ -15,6 +15,8 @@ const About = lazy(() => import("../pages/About"));
 const Help = lazy(() => import("../pages/Help"));
 const TasksCompleted = lazy(() => import("../pages/TasksCompleted"));
 const TasksOverdue = lazy(() => import("../pages/TasksOverdue"));
+const VerifySuccess = lazy(() => import("../pages/VerifySuccess"));
+const VerifyFail = lazy(() => import("../pages/VerifyFail"));
 
 const publicRoutes = [
   { path: "/", component: Home, layout: DefaultLayout, requiresAuth: true },
@@ -32,6 +34,8 @@ const publicRoutes = [
   { path: "/help", component: Help, layout: DefaultLayout, requiresAuth: true },
   { path: "/tasks-completed", component: TasksCompleted, layout: DefaultLayout, requiresAuth: true },
   { path: "/tasks-overdue", component: TasksOverdue, layout: DefaultLayout, requiresAuth: true },
+  { path: "/verify-success", component: VerifySuccess, layout: null, requiresAuth: false },
+  { path: "/verify-fail", component: VerifyFail, layout: null, requiresAuth: false },
 ];
 
 export default publicRoutes;

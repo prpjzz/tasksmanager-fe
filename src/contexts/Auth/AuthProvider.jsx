@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }) => {
 
     const handleRegister = async (userData) => {
         try {
-            await register(userData);
+            const response = await register(userData);
+            return response;
         } catch (error) {
             throw new Error("Registration failed: " + error.message);
         }
