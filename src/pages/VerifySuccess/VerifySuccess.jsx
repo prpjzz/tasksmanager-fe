@@ -11,13 +11,7 @@ const VerifySuccess = () => {
     };
 
     return (
-        <Box
-            minHeight="100vh"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            bgcolor="#f5f5f5"
-        >
+        <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
             <Paper elevation={3} sx={{ p: 5, textAlign: 'center', maxWidth: 400 }}>
                 <CheckCircleOutlineIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
                 <Typography variant="h5" gutterBottom>

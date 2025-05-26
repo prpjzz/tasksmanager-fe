@@ -6,7 +6,9 @@ import {
     login,
     logout,
     register,
-    getCurrentUser
+    getCurrentUser,
+    forgotPassword,
+    resetPassword,
 } from "../../services/authServices";
 import Context from "./Context";
 import * as userServices from "../../services/userServices";
@@ -83,6 +85,8 @@ export const AuthProvider = ({ children }) => {
                 register: handleRegister,
                 updateUser: handleUpdateUser,
                 saveUser: handleSaveUser,
+                forgotPassword,
+                resetPassword,
             }}
         >
             {children}

@@ -31,7 +31,7 @@ export default function TasksOverdue() {
     useEffect(() => {
         if (tasks && tasks.length > 0) {
             const subTasks = tasks.reduce((acc, task) => {
-                const tmp = (task.subtasks || []).map(subtask => ({
+                const tmp = (task.subtasks || []).map((subtask) => ({
                     ...subtask,
                     maintask: task.name,
                     maintask_id: task.id,
@@ -45,14 +45,19 @@ export default function TasksOverdue() {
     }, [tasks]);
 
     if (isLoading || isFetching) {
-        return <Typography variant="h6" align="center">Loading...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Loading...
+            </Typography>
+        );
     }
 
     const filteredTasks = allTasks.filter(
         (task) =>
             task.task_name.toLowerCase().includes(search.toLowerCase()) &&
             (priority === '' || task.priority_id === priority) &&
-            task.completed === false && task.status.name === 'Overdue'
+            task.completed === false &&
+            task.status.name === 'Overdue',
     );
 
     const paginatedTasks = filteredTasks.slice((page - 1) * rowsPerPage, page * rowsPerPage);
@@ -60,29 +65,32 @@ export default function TasksOverdue() {
     const handleDelete = (task) => {
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
-            const mainTask = tasks.find(t => t._id === task.maintask_id);
+            const mainTask = tasks.find((t) => t._id === task.maintask_id);
             if (mainTask) {
                 // Xóa subtask khỏi maintask
-                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask._id !== task._id);
+                const updatedSubtasks = mainTask.subtasks.filter((subtask) => subtask._id !== task._id);
 
                 // Update lại maintask
-                updateTask.mutate({
-                    ...mainTask,
-                    subtasks: updatedSubtasks,
-                }, {
-                    onSuccess: () => {
-                        setResponse({
-                            status: 'success',
-                            message: `Đã xóa subtask "${task.task_name}"`,
-                        });
+                updateTask.mutate(
+                    {
+                        ...mainTask,
+                        subtasks: updatedSubtasks,
                     },
-                    onError: (error) => {
-                        setResponse({
-                            status: 'error',
-                            message: `Lỗi khi xoá subtask "${task.task_name}"`,
-                        });
-                    }
-                });
+                    {
+                        onSuccess: () => {
+                            setResponse({
+                                status: 'success',
+                                message: `Đã xóa subtask "${task.task_name}"`,
+                            });
+                        },
+                        onError: (error) => {
+                            setResponse({
+                                status: 'error',
+                                message: `Lỗi khi xoá subtask "${task.task_name}"`,
+                            });
+                        },
+                    },
+                );
             }
         } else {
             // Nếu là task chính thì xóa
@@ -98,7 +106,7 @@ export default function TasksOverdue() {
                         status: 'error',
                         message: `Lỗi khi xoá task "${task.task_name}"`,
                     });
-                }
+                },
             });
         }
 
@@ -113,15 +121,15 @@ export default function TasksOverdue() {
                         particleCount: 120,
                         angle: 60,
                         spread: 90,
-                        origin: { x: 0, y: 0.5 }
+                        origin: { x: 0, y: 0.5 },
                     });
                     confetti({
                         particleCount: 120,
                         angle: 120,
                         spread: 90,
-                        origin: { x: 1, y: 0.5 }
+                        origin: { x: 1, y: 0.5 },
                     });
-                }
+                },
             });
         } else {
             updateTaskComplete.mutate(task, {
@@ -130,15 +138,15 @@ export default function TasksOverdue() {
                         particleCount: 120,
                         angle: 60,
                         spread: 90,
-                        origin: { x: 0, y: 0.5 }
+                        origin: { x: 0, y: 0.5 },
                     });
                     confetti({
                         particleCount: 120,
                         angle: 120,
                         spread: 90,
-                        origin: { x: 1, y: 0.5 }
+                        origin: { x: 1, y: 0.5 },
                     });
-                }
+                },
             });
         }
     };
@@ -231,11 +239,7 @@ export default function TasksOverdue() {
             />
 
             {response.message && (
-                <SnackbarAlert
-                    snackbarOpen={snackbarOpen}
-                    onClose={() => setSnackbarOpen(false)}
-                    response={response}
-                />
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
         </Box>
     );

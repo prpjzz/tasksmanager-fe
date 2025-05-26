@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Stack, TextField, InputAdornment, MenuItem, IconButton, Grid, Pagination } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Stack,
+    TextField,
+    InputAdornment,
+    MenuItem,
+    IconButton,
+    Grid,
+    Pagination,
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CardTask from '../../components/CardTask/CardTask';
@@ -26,7 +36,7 @@ export default function TasksCompleted() {
     useEffect(() => {
         if (tasks && tasks.length > 0) {
             const subTasks = tasks.reduce((acc, task) => {
-                const tmp = (task.subtasks || []).map(subtask => ({
+                const tmp = (task.subtasks || []).map((subtask) => ({
                     ...subtask,
                     maintask: task.task_name,
                     maintask_id: task._id,
@@ -43,41 +53,48 @@ export default function TasksCompleted() {
         (task) =>
             task.task_name.toLowerCase().includes(search.toLowerCase()) &&
             (priority === '' || task.priority._id === priority) &&
-            task.completed === true
+            task.completed === true,
     );
 
     const paginatedTasks = filteredTasks.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
     if (isLoading || isFetching) {
-        return <Typography variant="h6" align="center">Loading...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Loading...
+            </Typography>
+        );
     }
 
     const handleDelete = (task) => {
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
-            const mainTask = tasks.find(t => t._id === task.maintask_id);
+            const mainTask = tasks.find((t) => t._id === task.maintask_id);
             if (mainTask) {
                 // Xóa subtask khỏi maintask
-                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask._id !== task._id);
+                const updatedSubtasks = mainTask.subtasks.filter((subtask) => subtask._id !== task._id);
 
                 // Update lại maintask
-                updateTask.mutate({
-                    ...mainTask,
-                    subtasks: updatedSubtasks,
-                }, {
-                    onSuccess: () => {
-                        setResponse({
-                            status: 'success',
-                            message: `Đã xóa subtask "${task.task_name}"`,
-                        });
+                updateTask.mutate(
+                    {
+                        ...mainTask,
+                        subtasks: updatedSubtasks,
                     },
-                    onError: (error) => {
-                        setResponse({
-                            status: 'error',
-                            message: `Lỗi khi xoá subtask "${task.task_name}"`,
-                        });
-                    }
-                });
+                    {
+                        onSuccess: () => {
+                            setResponse({
+                                status: 'success',
+                                message: `Đã xóa subtask "${task.task_name}"`,
+                            });
+                        },
+                        onError: (error) => {
+                            setResponse({
+                                status: 'error',
+                                message: `Lỗi khi xoá subtask "${task.task_name}"`,
+                            });
+                        },
+                    },
+                );
             }
         } else {
             // Nếu là task chính thì xóa
@@ -93,7 +110,7 @@ export default function TasksCompleted() {
                         status: 'error',
                         message: `Lỗi khi xoá task "${task.task_name}"`,
                     });
-                }
+                },
             });
         }
 
@@ -179,11 +196,7 @@ export default function TasksCompleted() {
             />
 
             {response.message && (
-                <SnackbarAlert
-                    snackbarOpen={snackbarOpen}
-                    onClose={() => setSnackbarOpen(false)}
-                    response={response}
-                />
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
         </Box>
     );

@@ -1,20 +1,10 @@
 import React, { useState } from 'react';
-import {
-    Avatar,
-    Button,
-    TextField,
-    Typography,
-    Grid,
-    Paper,
-    IconButton,
-    InputAdornment,
-    Box,
-} from '@mui/material';
+import { Avatar, Button, TextField, Typography, Grid, Paper, IconButton, InputAdornment, Box } from '@mui/material';
 import { Visibility, VisibilityOff, PhotoCamera } from '@mui/icons-material';
 import SnackbarAlert from '../../components/SnackbarAlert';
 import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
-import * as userService from "../../services/userServices";
+import * as userService from '../../services/userServices';
 
 const AccountSettings = () => {
     const { user, saveUser } = useAuth();
@@ -90,7 +80,6 @@ const AccountSettings = () => {
                 };
                 reader.readAsDataURL(avatarFile);
             } else {
-
                 const updatedUser = {
                     name,
                     password,
@@ -141,9 +130,7 @@ const AccountSettings = () => {
                                     alt={user.name}
                                 />
                             ) : (
-                                <Avatar
-                                    sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }}
-                                />
+                                <Avatar sx={{ width: 100, height: 100, margin: 'auto', border: '2px solid #3f51b5' }} />
                             )}
                             <input
                                 accept="image/*"
@@ -178,10 +165,7 @@ const AccountSettings = () => {
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword((prev) => !prev)}
-                                                edge="end"
-                                            >
+                                            <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
                                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
                                         </InputAdornment>
@@ -199,10 +183,7 @@ const AccountSettings = () => {
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword((prev) => !prev)}
-                                                edge="end"
-                                            >
+                                            <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
                                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
                                         </InputAdornment>
@@ -221,18 +202,10 @@ const AccountSettings = () => {
             </Paper>
 
             {response.message && (
-                <SnackbarAlert
-                    snackbarOpen={snackbarOpen}
-                    onClose={() => setSnackbarOpen(false)}
-                    response={response}
-                />
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
 
-            {loading && (
-                <LoadingDialog
-                    open={loading}
-                />
-            )}
+            {loading && <LoadingDialog open={loading} />}
         </Box>
     );
 };

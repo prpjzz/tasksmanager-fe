@@ -1,13 +1,7 @@
 import { useTasks } from '../../hooks/tasks';
 import { useUpdateTaskComplete, useUpdateSubtaskComplete } from '../../hooks/tasks';
 import dayjs from '../../utils/dayjsConfig';
-import {
-    Box,
-    Typography,
-    Card,
-    CardContent,
-    Button
-} from '@mui/material';
+import { Box, Typography, Card, CardContent, Button } from '@mui/material';
 import confetti from 'canvas-confetti';
 
 const TaskCard = ({ task, onComplete }) => {
@@ -20,9 +14,8 @@ const TaskCard = ({ task, onComplete }) => {
         <Card
             variant="outlined"
             sx={{
-                borderLeft: `6px solid ${isOverdue ? '#f44336' : isSoon ? '#ffa726' : '#2196f3'
-                    }`,
-                mb: 2
+                borderLeft: `6px solid ${isOverdue ? '#f44336' : isSoon ? '#ffa726' : '#2196f3'}`,
+                mb: 2,
             }}
         >
             <CardContent>
@@ -37,9 +30,7 @@ const TaskCard = ({ task, onComplete }) => {
                 <Typography variant="body2" color="text.secondary">
                     {task.task_description}
                 </Typography>
-                <Typography variant="caption">
-                    Hạn: {taskDate.format('DD/MM/YYYY HH:mm')}
-                </Typography>
+                <Typography variant="caption">Hạn: {taskDate.format('DD/MM/YYYY HH:mm')}</Typography>
                 {task.maintask_name && (
                     <Typography variant="caption" display="block" color="text.secondary">
                         Task phụ của: {task.maintask_name}
@@ -58,9 +49,7 @@ const TaskSection = ({ title, tasks, onComplete }) => (
         {tasks.length === 0 ? (
             <Typography color="text.secondary">Không có công việc nào.</Typography>
         ) : (
-            tasks.map(task => (
-                <TaskCard key={task._id || task.id} task={task} onComplete={onComplete} />
-            ))
+            tasks.map((task) => <TaskCard key={task._id || task.id} task={task} onComplete={onComplete} />)
         )}
     </Box>
 );
@@ -78,15 +67,15 @@ const TodosPage = () => {
                         particleCount: 120,
                         angle: 60,
                         spread: 90,
-                        origin: { x: 0, y: 0.5 }
+                        origin: { x: 0, y: 0.5 },
                     });
                     confetti({
                         particleCount: 120,
                         angle: 120,
                         spread: 90,
-                        origin: { x: 1, y: 0.5 }
+                        origin: { x: 1, y: 0.5 },
                     });
-                }
+                },
             });
         } else {
             updateTaskComplete.mutate(task, {
@@ -95,15 +84,15 @@ const TodosPage = () => {
                         particleCount: 120,
                         angle: 60,
                         spread: 90,
-                        origin: { x: 0, y: 0.5 }
+                        origin: { x: 0, y: 0.5 },
                     });
                     confetti({
                         particleCount: 120,
                         angle: 120,
                         spread: 90,
-                        origin: { x: 1, y: 0.5 }
+                        origin: { x: 1, y: 0.5 },
                     });
-                }
+                },
             });
         }
     };
@@ -113,27 +102,37 @@ const TodosPage = () => {
     const endOfToday = now.endOf('day');
     const endOfSoon = now.add(3, 'day').endOf('day');
 
-    const allSubtasks = tasks.flatMap(task =>
-        task.subtasks?.map(sub => ({
-            ...sub,
-            maintask_id: task._id,
-            maintask_name: task.task_name
-        })) || []
+    const allSubtasks = tasks.flatMap(
+        (task) =>
+            task.subtasks?.map((sub) => ({
+                ...sub,
+                maintask_id: task._id,
+                maintask_name: task.task_name,
+            })) || [],
     );
     const allTasks = [...tasks, ...allSubtasks];
 
-    const todayTasks = allTasks.filter(task =>
-        dayjs(task.start_date).tz().isAfter(startOfToday) &&
-        dayjs(task.start_date).tz().isBefore(endOfToday) &&
-        task.status?.name === 'In Progress'
+    const todayTasks = allTasks.filter(
+        (task) =>
+            dayjs(task.start_date).tz().isAfter(startOfToday) &&
+            dayjs(task.start_date).tz().isBefore(endOfToday) &&
+            task.status?.name === 'In Progress',
     );
-    const upcomingTasks = allTasks.filter(task =>
-        dayjs(task?.extend_date || task?.end_date).tz().isAfter(endOfToday) &&
-        dayjs(task?.extend_date || task?.end_date).tz().isBefore(endOfSoon) &&
-        task.status?.name === 'In Progress'
+    const upcomingTasks = allTasks.filter(
+        (task) =>
+            dayjs(task?.extend_date || task?.end_date)
+                .tz()
+                .isAfter(endOfToday) &&
+            dayjs(task?.extend_date || task?.end_date)
+                .tz()
+                .isBefore(endOfSoon) &&
+            task.status?.name === 'In Progress',
     );
-    const overdueTasks = allTasks.filter(task =>
-        dayjs(task?.extend_date || task?.end_date).tz().isBefore(startOfToday) && task.status?.name === 'Overdue'
+    const overdueTasks = allTasks.filter(
+        (task) =>
+            dayjs(task?.extend_date || task?.end_date)
+                .tz()
+                .isBefore(startOfToday) && task.status?.name === 'Overdue',
     );
 
     return (
@@ -149,7 +148,7 @@ const TodosPage = () => {
                     gridTemplateColumns={{
                         xs: '1fr',
                         sm: 'repeat(2, 1fr)',
-                        md: 'repeat(3, 1fr)'
+                        md: 'repeat(3, 1fr)',
                     }}
                     gap={2}
                 >

@@ -15,7 +15,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../../components/ForgotPassword';
 import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
-import { getCurrentUser } from "../../services/authServices";
+import { getCurrentUser } from '../../services/authServices';
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -27,11 +27,9 @@ const Card = styled(MuiCard)(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         maxWidth: '450px',
     },
-    boxShadow:
-        'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
+    boxShadow: 'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
     ...theme.applyStyles('dark', {
-        boxShadow:
-            'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
+        boxShadow: 'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
     }),
 }));
 
@@ -48,12 +46,10 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
         position: 'absolute',
         zIndex: -1,
         inset: 0,
-        backgroundImage:
-            'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
+        backgroundImage: 'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
         backgroundRepeat: 'no-repeat',
         ...theme.applyStyles('dark', {
-            backgroundImage:
-                'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+            backgroundImage: 'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
         }),
     },
 }));
@@ -61,6 +57,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 export default function SignIn() {
     const [loading, setLoading] = React.useState(false);
     const [generalErrorMessage, setGeneralErrorMessage] = React.useState('');
+    const [successMessage, setSuccessMessage] = React.useState('');
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
@@ -89,7 +86,7 @@ export default function SignIn() {
 
         try {
             await user.login(data.get('email'), data.get('password'));
-            
+
             const response = await getCurrentUser();
 
             user.saveUser(response);
@@ -103,6 +100,8 @@ export default function SignIn() {
     };
 
     const validateInputs = () => {
+        setGeneralErrorMessage('');
+        setSuccessMessage('');
         const email = document.getElementById('email');
         const password = document.getElementById('password');
 
@@ -129,6 +128,18 @@ export default function SignIn() {
         return isValid;
     };
 
+    const handleForgotPassword = async (email) => {
+        setLoading(true);
+        try {
+            const response = await user.forgotPassword(email);
+            setSuccessMessage(response.message || 'Password reset link sent to your email.');
+        } catch (error) {
+            setGeneralErrorMessage(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <CssBaseline enableColorScheme />
@@ -142,11 +153,8 @@ export default function SignIn() {
                         Sign in
                     </Typography>
 
-                    {generalErrorMessage && (
-                        <Alert severity="error">
-                            {generalErrorMessage}
-                        </Alert>
-                    )}
+                    {generalErrorMessage && <Alert severity="error">{generalErrorMessage}</Alert>}
+                    {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
                     <Box
                         component="form"
@@ -176,6 +184,7 @@ export default function SignIn() {
                                 color={emailError ? 'error' : 'primary'}
                             />
                         </FormControl>
+
                         <FormControl>
                             <FormLabel htmlFor="password">Password</FormLabel>
                             <TextField
@@ -193,13 +202,14 @@ export default function SignIn() {
                                 color={passwordError ? 'error' : 'primary'}
                             />
                         </FormControl>
-                        <ForgotPassword open={open} handleClose={handleClose} />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            onClick={validateInputs}
-                        >
+
+                        <ForgotPassword
+                            open={open}
+                            handleClose={handleClose}
+                            handleForgotPassword={handleForgotPassword}
+                        />
+
+                        <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
                             Sign in
                         </Button>
                         <Link
@@ -211,22 +221,13 @@ export default function SignIn() {
                         >
                             Forgot your password?
                         </Link>
-                        <RouterLink
-                            to="/register"
-                            variant="body2"
-                            sx={{ alignSelf: 'center' }}
-                        >
+                        <RouterLink to="/register" variant="body2" sx={{ alignSelf: 'center' }}>
                             Don't have an account? Sign up
                         </RouterLink>
                     </Box>
 
                     {/* Login with social media */}
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{ width: '100%' }}
-                    >
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
                         <Button
                             variant="outlined"
                             color="primary"
@@ -252,9 +253,7 @@ export default function SignIn() {
             </SignInContainer>
 
             {/* Loading indicator */}
-            {loading && (
-                <LoadingDialog open={loading} />
-            )}
+            {loading && <LoadingDialog open={loading} />}
         </>
     );
 }

@@ -10,7 +10,7 @@ import {
     Stack,
     Typography,
     Grid,
-    capitalize
+    capitalize,
 } from '@mui/material';
 import TaskCardWrapper from './TaskCardWrapper';
 import SnackbarAlert from '../../components/SnackbarAlert';
@@ -23,7 +23,7 @@ const Task = () => {
     const { data: tasks, isLoading, isFetching } = useTasks();
     const updateTask = useUpdateTask();
     const deleteTask = useDeleteTask();
-    
+
     const [allTasks, setAllTasks] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [response, setResponse] = useState({});
@@ -36,7 +36,7 @@ const Task = () => {
     useEffect(() => {
         if (tasks && tasks.length > 0) {
             const subTasks = tasks.reduce((acc, task) => {
-                const tmp = (task.subtasks || []).map(subtask => ({
+                const tmp = (task.subtasks || []).map((subtask) => ({
                     ...subtask,
                     maintask: task.task_name,
                     maintask_id: task._id,
@@ -50,14 +50,22 @@ const Task = () => {
     }, [tasks]);
 
     if (isLoading) {
-        return <Typography variant="h6" align="center">Loading...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Loading...
+            </Typography>
+        );
     }
 
     if (isFetching) {
-        return <Typography variant="h6" align="center">Tải lại dữ liệu...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Tải lại dữ liệu...
+            </Typography>
+        );
     }
 
-    const filteredTasks = allTasks.filter(task => {
+    const filteredTasks = allTasks.filter((task) => {
         return (
             task.task_name.toLowerCase().includes(search.toLowerCase()) &&
             (statusFilter ? task.status._id === statusFilter : true) &&
@@ -66,7 +74,7 @@ const Task = () => {
     });
 
     const paginatedTasks = filteredTasks.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-    
+
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
         setPage(1);
@@ -88,7 +96,7 @@ const Task = () => {
                     status: 'error',
                     message: `Lỗi khi cập nhật task "${task.task_name}"`,
                 });
-            }
+            },
         });
 
         setSnackbarOpen(true);
@@ -97,29 +105,32 @@ const Task = () => {
     const handleDeleteTask = async (task) => {
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
-            const mainTask = tasks.find(t => t._id === task.maintask_id);
+            const mainTask = tasks.find((t) => t._id === task.maintask_id);
             if (mainTask) {
                 // Xóa subtask khỏi maintask
-                const updatedSubtasks = mainTask.subtasks.filter(subtask => subtask._id !== task._id);
+                const updatedSubtasks = mainTask.subtasks.filter((subtask) => subtask._id !== task._id);
 
                 // Update lại maintask
-                updateTask.mutate({
-                    ...mainTask,
-                    subtasks: updatedSubtasks,
-                }, {
-                    onSuccess: () => {
-                        setResponse({
-                            status: 'success',
-                            message: `Đã xóa subtask "${task.task_name}"`,
-                        });
+                updateTask.mutate(
+                    {
+                        ...mainTask,
+                        subtasks: updatedSubtasks,
                     },
-                    onError: (error) => {
-                        setResponse({
-                            status: 'error',
-                            message: `Lỗi khi xoá subtask "${task.task_name}"`,
-                        });
-                    }
-                });
+                    {
+                        onSuccess: () => {
+                            setResponse({
+                                status: 'success',
+                                message: `Đã xóa subtask "${task.task_name}"`,
+                            });
+                        },
+                        onError: (error) => {
+                            setResponse({
+                                status: 'error',
+                                message: `Lỗi khi xoá subtask "${task.task_name}"`,
+                            });
+                        },
+                    },
+                );
             }
         } else {
             // Nếu là task chính thì xóa
@@ -135,28 +146,28 @@ const Task = () => {
                         status: 'error',
                         message: `Lỗi khi xoá task "${task.task_name}"`,
                     });
-                }
+                },
             });
         }
 
         setSnackbarOpen(true);
     };
-    
+
     return (
         <Box p={3}>
-            <Typography variant="h4" mb={2}>Task Management</Typography>
+            <Typography variant="h4" mb={2}>
+                Task Management
+            </Typography>
             <Stack direction="row" spacing={2} mb={3}>
-                <TextField
-                    label="Search Tasks"
-                    variant="outlined"
-                    value={search}
-                    onChange={handleSearchChange}
-                />
+                <TextField label="Search Tasks" variant="outlined" value={search} onChange={handleSearchChange} />
                 <FormControl vaubriant="outlined" sx={{ minWidth: 150 }}>
                     <InputLabel>Status</InputLabel>
                     <Select
                         value={statusFilter}
-                        onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setPage(1);
+                        }}
                         label="Status"
                     >
                         <MenuItem value="">All</MenuItem>
@@ -171,7 +182,10 @@ const Task = () => {
                     <InputLabel>Priority</InputLabel>
                     <Select
                         value={priorityFilter}
-                        onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}
+                        onChange={(e) => {
+                            setPriorityFilter(e.target.value);
+                            setPage(1);
+                        }}
                         label="Priority"
                     >
                         <MenuItem value="">All</MenuItem>
@@ -186,18 +200,16 @@ const Task = () => {
 
             <Grid container spacing={2}>
                 {paginatedTasks.length > 0 ? (
-                    paginatedTasks.map(task => (
+                    paginatedTasks.map((task) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={task._id}>
-                            <TaskCardWrapper
-                                task={task}
-                                onEdit={handleEditTask}
-                                onDelete={handleDeleteTask}
-                            />
+                            <TaskCardWrapper task={task} onEdit={handleEditTask} onDelete={handleDeleteTask} />
                         </Grid>
                     ))
                 ) : (
                     <Grid item xs={12}>
-                        <Typography align="center" color="text.secondary">No tasks found</Typography>
+                        <Typography align="center" color="text.secondary">
+                            No tasks found
+                        </Typography>
                     </Grid>
                 )}
             </Grid>
@@ -212,13 +224,8 @@ const Task = () => {
             </Box>
 
             {snackbarOpen && (
-                <SnackbarAlert
-                    snackbarOpen={snackbarOpen}
-                    onClose={() => setSnackbarOpen(false)}
-                    response={response}
-                />
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
-
         </Box>
     );
 };

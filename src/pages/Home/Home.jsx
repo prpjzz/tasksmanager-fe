@@ -20,26 +20,28 @@ const Home = () => {
 
     useEffect(() => {
         const handleGenerateEvents = (tasks) => {
-            const tasksFiltered = tasks.filter(t => t.completed === false && t.status.name !== 'Overdue');
+            const tasksFiltered = tasks.filter((t) => t.completed === false && t.status.name !== 'Overdue');
 
-            return tasksFiltered ? tasksFiltered.flatMap((task) => ({
-                id: `task-${task.id}`,
-                group: `task-${task.id}`,
-                title: task.task_name,
-                start: dayjs(task.start_date).format('YYYY-MM-DDTHH:mm:ss'),
-                end: dayjs(task?.extend_date || task.end_date).format('YYYY-MM-DDTHH:mm:ss'),
-                description: task.task_description,
-                status: task.status,
-                priority: task.priority,
-                subtasks: task.subtasks,
-                backgroundColor: '#4caf50',
-                extendedProps: {
-                    taskId: task.id,
-                    extend_date: task?.extend_date ? dayjs(task.extend_date).format('YYYY-MM-DDTHH:mm:ss') : null,
-                    isExtension: false
-                }
-            })) : [];
-        }
+            return tasksFiltered
+                ? tasksFiltered.flatMap((task) => ({
+                      id: `task-${task.id}`,
+                      group: `task-${task.id}`,
+                      title: task.task_name,
+                      start: dayjs(task.start_date).format('YYYY-MM-DDTHH:mm:ss'),
+                      end: dayjs(task?.extend_date || task.end_date).format('YYYY-MM-DDTHH:mm:ss'),
+                      description: task.task_description,
+                      status: task.status,
+                      priority: task.priority,
+                      subtasks: task.subtasks,
+                      backgroundColor: '#4caf50',
+                      extendedProps: {
+                          taskId: task.id,
+                          extend_date: task?.extend_date ? dayjs(task.extend_date).format('YYYY-MM-DDTHH:mm:ss') : null,
+                          isExtension: false,
+                      },
+                  }))
+                : [];
+        };
 
         const fetchData = async () => {
             const taskEvents = handleGenerateEvents(tasks);
@@ -47,11 +49,11 @@ const Home = () => {
             // Generate weekly recurring schedule events for the next 2 weeks
             const today = moment().startOf('week'); // Sunday
             const next14Days = Array.from({ length: 14 }, (_, i) => moment(today).add(i, 'days'));
-            
+
             const scheduleEvents = [];
             if (schedules && schedules.length > 0) {
-                schedules.forEach(schedule => {
-                    next14Days.forEach(day => {
+                schedules.forEach((schedule) => {
+                    next14Days.forEach((day) => {
                         if (schedule.days.includes(day.format('dddd'))) {
                             const start = `${day.format('YYYY-MM-DD')}T${schedule.startTime}`;
                             const end = `${day.format('YYYY-MM-DD')}T${schedule.endTime}`;
@@ -60,7 +62,7 @@ const Home = () => {
                                 title: schedule.title,
                                 start,
                                 end,
-                                backgroundColor: '#2196f3'
+                                backgroundColor: '#2196f3',
                             });
                         }
                     });
@@ -73,11 +75,19 @@ const Home = () => {
     }, [tasks, schedules]);
 
     if (isLoadingTasks || isLoadingSchedules) {
-        return <Typography variant="h6" align="center">Loading...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Loading...
+            </Typography>
+        );
     }
 
     if (isFetchingTasks || isFetchingSchedules) {
-        return <Typography variant="h6" align="center">Tải lại dữ liệu...</Typography>;
+        return (
+            <Typography variant="h6" align="center">
+                Tải lại dữ liệu...
+            </Typography>
+        );
     }
 
     const handleViewDetails = (info) => {
@@ -92,12 +102,12 @@ const Home = () => {
             extend_date: info.event.extendedProps?.extend_date || null,
         });
         setOpen(true); // Open the task detail dialog
-    }
+    };
 
     const handleCloseDetails = () => {
         setTaskDetail(null);
         setOpen(false); // Close the task detail dialog
-    }
+    };
 
     return (
         <Box
@@ -121,7 +131,7 @@ const Home = () => {
                     headerToolbar={{
                         start: 'prev,next today',
                         center: 'title',
-                        end: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        end: 'dayGridMonth,timeGridWeek,timeGridDay',
                     }}
                     editable={true}
                     allDaySlot={true}
@@ -149,6 +159,6 @@ const Home = () => {
             )}
         </Box>
     );
-}
+};
 
 export default Home;
