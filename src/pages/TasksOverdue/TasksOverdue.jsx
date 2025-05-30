@@ -208,11 +208,10 @@ export default function TasksOverdue() {
                                     <DeleteIcon />
                                 </IconButton>
                                 <Button
-                                    variant="contained"
-                                    color="success"
+                                    variant="outlined"
                                     size="small"
                                     startIcon={<CheckCircleIcon />}
-                                    sx={{ position: 'absolute', bottom: 8, right: 8 }}
+                                    sx={{ position: 'absolute', bottom: 3, right: 3 }}
                                     onClick={() => handleComplete(task._id)}
                                 >
                                     Hoàn thành

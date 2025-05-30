@@ -5,7 +5,7 @@ import { Box, Typography, Card, CardContent, Button } from '@mui/material';
 import confetti from 'canvas-confetti';
 
 const TaskCard = ({ task, onComplete }) => {
-    const taskDate = dayjs(task.end_date).tz();
+    const taskDate = dayjs(task?.extend_date || task?.end_date).tz();
     const now = dayjs().tz();
     const isOverdue = taskDate.isBefore(now);
     const isSoon = taskDate.diff(now, 'day') <= 3 && !isOverdue;
@@ -14,7 +14,7 @@ const TaskCard = ({ task, onComplete }) => {
         <Card
             variant="outlined"
             sx={{
-                borderLeft: `6px solid ${isOverdue ? '#f44336' : isSoon ? '#ffa726' : '#2196f3'}`,
+                borderLeft: `6px solid ${task.status?.color || '#ccc'}`,
                 mb: 2,
             }}
         >

@@ -6,17 +6,23 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Box from '@mui/material/Box';
 import TaskDetail from '../../components/TaskDetail';
+import SnackbarAlert from '../../components/SnackbarAlert';
 import dayjs from '../../utils/dayjsConfig';
 import moment from 'moment';
-import { useTasks } from '../../hooks/tasks';
+import * as taskServices from '../../services/taskServices';
+import { useTasks, useUpdateTask } from '../../hooks/tasks';
 import { useSchedules } from '../../hooks/schedules';
 
 const Home = () => {
     const { data: tasks, isLoading: isLoadingTasks, isFetching: isFetchingTasks } = useTasks();
     const { data: schedules, isLoading: isLoadingSchedules, isFetching: isFetchingSchedules } = useSchedules();
+    const updateTask = useUpdateTask();
+
     const [taskDetail, setTaskDetail] = useState(null);
     const [open, setOpen] = useState(false);
     const [events, setEvents] = useState([]);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [response, setResponse] = useState({});
 
     useEffect(() => {
         const handleGenerateEvents = (tasks) => {
@@ -24,8 +30,8 @@ const Home = () => {
 
             return tasksFiltered
                 ? tasksFiltered.flatMap((task) => ({
-                      id: `task-${task.id}`,
-                      group: `task-${task.id}`,
+                      id: `task-${task._id}`,
+                      group: `task-${task._id}`,
                       title: task.task_name,
                       start: dayjs(task.start_date).format('YYYY-MM-DDTHH:mm:ss'),
                       end: dayjs(task?.extend_date || task.end_date).format('YYYY-MM-DDTHH:mm:ss'),
@@ -33,11 +39,10 @@ const Home = () => {
                       status: task.status,
                       priority: task.priority,
                       subtasks: task.subtasks,
-                      backgroundColor: '#4caf50',
                       extendedProps: {
-                          taskId: task.id,
+                          taskId: task._id,
                           extend_date: task?.extend_date ? dayjs(task.extend_date).format('YYYY-MM-DDTHH:mm:ss') : null,
-                          isExtension: false,
+                          isExtension: true,
                       },
                   }))
                 : [];
@@ -58,11 +63,11 @@ const Home = () => {
                             const start = `${day.format('YYYY-MM-DD')}T${schedule.startTime}`;
                             const end = `${day.format('YYYY-MM-DD')}T${schedule.endTime}`;
                             scheduleEvents.push({
-                                id: `schedule-${schedule.id}-${day.format('YYYY-MM-DD')}`,
+                                id: `schedule-${schedule._id}-${day.format('YYYY-MM-DD')}`,
                                 title: schedule.title,
                                 start,
                                 end,
-                                backgroundColor: '#2196f3',
+                                backgroundColor: '#4CAF50',
                             });
                         }
                     });
@@ -109,6 +114,58 @@ const Home = () => {
         setOpen(false); // Close the task detail dialog
     };
 
+    const handleResize = async (taskId, newEndDate) => {
+        try {
+            const tasks = await taskServices.getTaskById(taskId);
+            if (!tasks) {
+                alert('Task not found.');
+                return;
+            }
+
+            const updatedTask = {
+                ...tasks,
+                extend_date: newEndDate ? dayjs(newEndDate).toISOString() : null,
+            };
+
+            updateTask.mutate(updatedTask, {
+                onSuccess: () => {
+                    setEvents((prevEvents) =>
+                        prevEvents.map((event) =>
+                            event.id === `task-${taskId}`
+                                ? {
+                                      ...event,
+                                      end: newEndDate ? dayjs(newEndDate).format('YYYY-MM-DDTHH:mm:ss') : null,
+                                      extendedProps: {
+                                          ...event.extendedProps,
+                                          extend_date: newEndDate
+                                              ? dayjs(newEndDate).format('YYYY-MM-DDTHH:mm:ss')
+                                              : null,
+                                      },
+                                  }
+                                : event,
+                        ),
+                    );
+                    setResponse({
+                        status: 'success',
+                        message: 'Cập nhật thời gian thành công.',
+                    });
+                },
+                onError: (error) => {
+                    console.error('Error updating task:', error);
+                    setResponse({
+                        status: 'error',
+                        message: 'Có lỗi xảy ra khi cập nhật thời gian. Vui lòng thử lại.',
+                    });
+                },
+            });
+        } catch (error) {
+            console.error('Error resizing task:', error);
+            alert('Có lỗi xảy ra khi cập nhật thời gian. Vui lòng thử lại.');
+        } finally {
+            setSnackbarOpen(true);
+        }
+    };
+
     return (
         <Box
             sx={{
@@ -134,7 +191,10 @@ const Home = () => {
                         end: 'dayGridMonth,timeGridWeek,timeGridDay',
                     }}
                     editable={true}
-                    allDaySlot={true}
+                    eventStartEditable={false}
+                    eventDurationEditable={true}
+                    eventResizableFromStart={false}
+                    allDaySlot={false}
                     slotMinTime="06:00:00"
                     slotMaxTime="22:00:00"
                     events={events}
@@ -146,6 +206,26 @@ const Home = () => {
                         console.log('Clicked event:', info);
                         handleViewDetails(info);
                     }}
+                    eventResize={(info) => {
+                        if (info.view.type === 'dayGridMonth') {
+                            info.revert();
+                            alert('Vui lòng sử dụng chế độ xem tuần hoặc ngày để chỉnh sửa thời gian.');
+                            return;
+                        }
+
+                        if (info.event.id.startsWith('schedule-')) {
+                            info.revert();
+                            alert(
+                                'Không thể chỉnh sửa thời gian của lịch biểu. Vui lòng vào tab Schedules để chỉnh sửa.',
+                            );
+                            return;
+                        }
+
+                        const taskId = info.event.extendedProps.taskId;
+                        const newEndDate = info.event.end ? info.event.end.toISOString() : null;
+
+                        handleResize(taskId, newEndDate);
+                    }}
                     height="auto"
                 />
             </div>
@@ -156,6 +236,10 @@ const Home = () => {
                     task={taskDetail}
                     onClose={handleCloseDetails} // Pass the close handler to TaskDetail
                 />
+            )}
+
+            {snackbarOpen && (
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
         </Box>
     );
