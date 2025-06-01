@@ -35,3 +35,10 @@ export const useUpdateSchedule = () => {
     },
   });
 }
+export const useDeleteSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: scheduleServices.deleteSchedule,
+    onSuccess: () => queryClient.invalidateQueries(['schedules']),
+  });
+}

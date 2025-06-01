@@ -30,3 +30,14 @@ export const updateSchedule = async (scheduleId, updatedSchedule) => {
         throw new Error('Error updating schedule: ' + error.message);
     }
 }
+export const deleteSchedule = async (scheduleId) => {
+  try {
+    const response = await fetch(`http://localhost:3001/schedules/${scheduleId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete schedule');
+    return { id: scheduleId };
+  } catch (error) {
+    throw new Error('Error deleting schedule: ' + error.message);
+  }
+}
