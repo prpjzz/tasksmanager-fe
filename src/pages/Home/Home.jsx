@@ -14,8 +14,8 @@ import { useTasks, useUpdateTask } from '../../hooks/tasks';
 import { useSchedules } from '../../hooks/schedules';
 
 const Home = () => {
-    const { data: tasks, isLoading: isLoadingTasks, isFetching: isFetchingTasks } = useTasks();
-    const { data: schedules, isLoading: isLoadingSchedules, isFetching: isFetchingSchedules } = useSchedules();
+    const { data: tasks = [], isLoading: isLoadingTasks, isFetching: isFetchingTasks } = useTasks();
+    const { data: schedules = [], isLoading: isLoadingSchedules, isFetching: isFetchingSchedules } = useSchedules();
     const updateTask = useUpdateTask();
 
     const [taskDetail, setTaskDetail] = useState(null);
@@ -114,16 +114,31 @@ const Home = () => {
         setOpen(false); // Close the task detail dialog
     };
 
-    const handleResize = async (taskId, newEndDate) => {
+    const handleResize = async (taskId, newEndDate, info) => {
         try {
-            const tasks = await taskServices.getTaskById(taskId);
-            if (!tasks) {
-                alert('Task not found.');
+            const task = await taskServices.getTaskById(taskId);
+            if (!task) {
+                info.revert();
+                setResponse({
+                    status: 'error',
+                    message: 'Công việc không tồn tại.',
+                });
+                return;
+            }
+
+            const taskEnd = task?.extend_date ? task.extend_date : task.end_date;
+
+            if (taskEnd && newEndDate && dayjs(newEndDate).isBefore(dayjs(taskEnd))) {
+                info.revert();
+                setResponse({
+                    status: 'error',
+                    message: 'Ngày kết thúc mới không thể trước ngày kết thúc hiện tại.',
+                });
                 return;
             }
 
             const updatedTask = {
-                ...tasks,
+                ...task,
                 extend_date: newEndDate ? dayjs(newEndDate).toISOString() : null,
             };
 
@@ -224,7 +239,7 @@ const Home = () => {
                         const taskId = info.event.extendedProps.taskId;
                         const newEndDate = info.event.end ? info.event.end.toISOString() : null;
 
-                        handleResize(taskId, newEndDate);
+                        handleResize(taskId, newEndDate, info);
                     }}
                     height="auto"
                 />
