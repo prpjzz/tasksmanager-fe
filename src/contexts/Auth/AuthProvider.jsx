@@ -67,10 +67,20 @@ export const AuthProvider = ({ children }) => {
             throw new Error("Update failed: " + error.message);
         }
     };
+    const handleUpdatePassword = async (currentPassword, newPassword) => {
+  try {
+    const updatedUser = await updatePassword(user.id, currentPassword, newPassword);
+    setUser(updatedUser);
+    return updatedUser;
+  } catch (error) {
+    throw new Error("Update password failed: " + error.message);
+  }
+};
 
     if (loading) {
         return <div>Loading...</div>;
     }
+
 
     return (
         <Context.Provider
@@ -81,6 +91,7 @@ export const AuthProvider = ({ children }) => {
                 logout: handleLogout,
                 register: handleRegister,
                 updateUser: handleUpdateUser,
+                updatePassword: handleUpdatePassword, // Thêm hàm mới
             }}
         >
             {children}

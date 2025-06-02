@@ -46,3 +46,18 @@ export const getCurrentUser = () => {
     const user = localStorage.getItem(authKey);
     return user ? JSON.parse(user) : null;
 }
+export const updatePassword = async (userId, currentPassword, newPassword) => {
+  try {
+    const user = await userServices.getUserById(userId);
+    if (user.data.password !== currentPassword) {
+      throw new Error('Mật khẩu hiện tại không đúng');
+    }
+    const updatedUser = { ...user.data, password: newPassword };
+    await userServices.updateUser(userId, updatedUser);
+    saveUser(updatedUser);
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating password:', error);
+    throw new Error('Error updating password: ' + error.message);
+  }
+};
