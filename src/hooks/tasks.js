@@ -60,7 +60,7 @@ export const useUpdateSubtaskComplete = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (task) => taskServices.updateSubtaskComplete(task._id, task.maintask_id),
+    mutationFn: (task) => taskServices.updateSubTaskComplete(task.maintask_id, task._id),
     onSuccess: () => {
       queryClient.invalidateQueries(['tasks']);
     },

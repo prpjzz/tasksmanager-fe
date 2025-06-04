@@ -64,10 +64,12 @@ const TaskCardWrapper = ({ task, onEdit, onDelete }) => {
             </IconButton>
 
             <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu} TransitionComponent={Fade}>
-                <MenuItem onClick={handleEdit}>
-                    <EditIcon fontSize="small" sx={{ mr: 1 }} />
-                    Sửa
-                </MenuItem>
+                {task.completed ? null : (
+                    <MenuItem onClick={handleEdit}>
+                        <EditIcon fontSize="small" sx={{ mr: 1 }} />
+                        Sửa
+                    </MenuItem>
+                )}
                 <MenuItem onClick={handleDelete}>
                     <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
                     Xoá

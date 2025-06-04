@@ -114,6 +114,9 @@ export default function TasksOverdue() {
     };
 
     const handleComplete = (id) => {
+        const task = paginatedTasks.find((t) => t._id === id);
+        if (!task) return;
+
         if (task.maintask_id) {
             updateSubtaskComplete.mutate(task, {
                 onSuccess: () => {

@@ -1,16 +1,8 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Button,
-    capitalize,
-} from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, capitalize } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import vi from 'date-fns/locale/vi';
 import Selection from '../Form/Selection';
 import * as taskServices from '../../services/taskServices';
@@ -34,32 +26,41 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     setMainTask(mainTask);
                 }
             }
-        }
+        };
 
         fetchMainTask();
-    }, [open, editedTask.maintask_id])
+    }, [open, editedTask.maintask_id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedTask((prev) => ({ ...prev, [name]: value }));
     };
-    
+
     const handleStatusChange = useCallback((e) => {
         setStatus(e.target.value);
     }, []);
-    
+
     const handlePriorityChange = useCallback((e) => {
         setPriority(e.target.value);
     }, []);
-    
+
     const handleDateChange = (newValue) => {
         setEditedTask((prev) => ({ ...prev, extend_date: newValue }));
     };
-    
+
     const handleSave = async () => {
         if (editedTask.maintask_id && editedTask.maintask_id !== '') {
             const mainTask = await taskServices.getTaskById(editedTask.maintask_id);
             if (mainTask) {
+                let completed = false;
+                let completed_date = null;
+
+                let completedStatus = statusTask.find((s) => s.name === 'Completed');
+                if (completedStatus && status === completedStatus._id) {
+                    completed = true;
+                    completed_date = new Date();
+                }
+
                 onSave({
                     ...mainTask,
                     subtasks: [
@@ -68,6 +69,9 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                                 return {
                                     ...editedTask,
                                     status,
+                                    priority,
+                                    completed,
+                                    completed_date,
                                     extend_date: editedTask.extend_date,
                                     updated_at: new Date(),
                                 };
@@ -75,17 +79,29 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                             return subtask;
                         }),
                     ],
-                })
+                });
             }
-        }  else {
+        } else {
+            let completed = false;
+            let completed_date = null;
+
+            let completedStatus = statusTask.find((s) => s.name === 'Completed');
+            if (completedStatus && status === completedStatus._id) {
+                completed = true;
+                completed_date = new Date();
+            }
+
             onSave({
                 ...editedTask,
                 status,
+                priority,
                 extend_date: editedTask.extend_date,
                 updated_at: new Date(),
+                completed,
+                completed_date,
             });
         }
-            
+
         onClose();
     };
 
@@ -116,18 +132,20 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     name="status"
                     value={status}
                     onChange={handleStatusChange}
-                    menuitems={useMemo(() => [
-                        ...statusTask.map(s => ({ value: s._id, label: capitalize(s.name) })),
-                    ], [statusTask])}
+                    menuitems={useMemo(
+                        () => [...statusTask.map((s) => ({ value: s._id, label: capitalize(s.name) }))],
+                        [statusTask],
+                    )}
                 />
                 <Selection
                     title="Độ ưu tiên"
                     name="priority"
                     value={priority}
                     onChange={handlePriorityChange}
-                    menuitems={useMemo(() => [
-                        ...priorityTask.map(s => ({ value: s._id, label: capitalize(s.name) })),
-                    ], [priorityTask])}
+                    menuitems={useMemo(
+                        () => [...priorityTask.map((s) => ({ value: s._id, label: capitalize(s.name) }))],
+                        [priorityTask],
+                    )}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                     <DateTimePicker
@@ -135,8 +153,9 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                         value={new Date(editedTask.extend_date).getTime()}
                         onChange={handleDateChange}
                         minDateTime={new Date(editedTask.start_date).getTime()}
-                        {...((mainTask && mainTask.end_date) ?
-                            { maxDateTime: new Date(mainTask?.extend_date ?? mainTask.end_date).getTime() } : {})}
+                        {...(mainTask && mainTask.end_date
+                            ? { maxDateTime: new Date(mainTask?.extend_date ?? mainTask.end_date).getTime() }
+                            : {})}
                         enableAccessibleFieldDOMStructure={false}
                         slots={{ textField: TextField }}
                     />
@@ -148,7 +167,7 @@ const EditTaskDialog = ({ open, onClose, task, onSave }) => {
                     Lưu
                 </Button>
             </DialogActions>
-        </Dialog>   
+        </Dialog>
     );
 };
 
