@@ -61,46 +61,51 @@ const Schedules = () => {
         // Handle edit action
         setSelectedSchedule(schedule);
         setOpenEditDialog(true);
-        console.log('Edit schedule:', schedule);
     };
 
     const onDelete = (schedule) => {
         // Handle delete action
         setSelectedSchedule(schedule);
         setDeleteOpenDialog(true);
-        console.log('Delete schedule:', schedule);
     };
 
     const handleEdit = (updatedSchedule) => {
+        setResponse({});
+        setSnackbarOpen(false);
+
         // Handle save action
         updateSchedule.mutate(updatedSchedule, {
             onSuccess: () => {
                 setOpenEditDialog(false);
                 setSelectedSchedule(null);
                 setResponse({ status: 'success', message: 'Cập nhật lịch học thành công!' });
+                setSnackbarOpen(true);
             },
             onError: (error) => {
-                console.error('Error updating schedule:', error);
                 setResponse({ status: 'error', message: 'Cập nhật lịch học thất bại!' });
+                setSnackbarOpen(true);
             },
         });
-        setSnackbarOpen(true);
     };
 
     const handleDelete = (schedule) => {
+        setResponse({});
+        setSnackbarOpen(false);
+
         // Handle delete action
         deleteSchedule.mutate(schedule._id, {
             onSuccess: () => {
                 setDeleteOpenDialog(false);
                 setSelectedSchedule(null);
                 setResponse({ status: 'success', message: 'Xoá lịch học thành công!' });
+                setSnackbarOpen(true);
             },
             onError: (error) => {
                 console.error('Error deleting schedule:', error);
                 setResponse({ status: 'error', message: 'Xoá lịch học thất bại!' });
+                setSnackbarOpen(true);
             },
         });
-        setSnackbarOpen(true);
     };
 
     return (
@@ -203,7 +208,7 @@ const Schedules = () => {
                 </Dialog>
             )}
 
-            {response.message && (
+            {snackbarOpen && (
                 <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
         </Box>

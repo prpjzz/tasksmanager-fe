@@ -136,7 +136,25 @@ const AddTask = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(mainTask);
+
+        if (!taskName || !taskDescription || !status || !priority) {
+            setResponse({
+                status: 'error',
+                message: 'Vui lòng điền đầy đủ thông tin',
+            });
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (dateTimeRange.start > dateTimeRange.end) {
+            setResponse({
+                status: 'error',
+                message: 'Thời gian bắt đầu không được lớn hơn thời gian kết thúc',
+            });
+            setSnackbarOpen(true);
+            return;
+        }
+
         if (mainTask !== null) {
             const selectedMainTask = mainTasks.find((task) => task._id === mainTask._id);
             if (!selectedMainTask) return;
@@ -161,8 +179,10 @@ const AddTask = () => {
                 onSuccess: () => {
                     setResponse({
                         status: 'success',
-                        message: `Thêm subtask "${taskName}" thành công`,
+                        message: `Thêm task "${taskName}" vào task chính "${selectedMainTask.task_name}" thành công`,
                     });
+                    setSnackbarOpen(true);
+
                     setMainTasks((prev) => {
                         const updatedMainTasks = prev.map((task) => {
                             if (task._id === mainTask) {
@@ -184,8 +204,9 @@ const AddTask = () => {
                 onError: (error) => {
                     setResponse({
                         status: 'error',
-                        message: error.response.data.message,
+                        message: `Có lỗi xảy ra khi thêm task: ${error.message}`,
                     });
+                    setSnackbarOpen(true);
                 },
             });
         } else {
@@ -205,6 +226,8 @@ const AddTask = () => {
                         status: 'success',
                         message: `Thêm task "${taskName}" thành công`,
                     });
+                    setSnackbarOpen(true);
+
                     setMainTasks((prev) => [
                         ...prev,
                         {
@@ -215,8 +238,9 @@ const AddTask = () => {
                 onError: (error) => {
                     setResponse({
                         status: 'error',
-                        message: error.response.data.message,
+                        message: `Có lỗi xảy ra khi thêm task: ${error.message}`,
                     });
+                    setSnackbarOpen(true);
                 },
             });
         }
@@ -226,7 +250,7 @@ const AddTask = () => {
         setMainTask(null);
         setStatus('');
         setPriority('');
-        setSnackbarOpen(true);
+        setTaskType('main');
         setDateTimeRange({
             start: new Date(),
             end: new Date(),

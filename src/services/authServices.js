@@ -17,6 +17,7 @@ export const register = async (user) => {
         const response = await httpRequest.post('/auth/register', user);
         return response.data;
     } catch (error) {
+        console.error('Error in register:', error);
         if (error.response && error.response.data.message) {
             throw new Error(error.response.data.message);
         } else {

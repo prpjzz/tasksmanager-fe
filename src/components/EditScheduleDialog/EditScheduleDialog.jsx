@@ -11,7 +11,7 @@ import {
     Select,
     MenuItem,
     Checkbox,
-    ListItemText
+    ListItemText,
 } from '@mui/material';
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -22,7 +22,7 @@ const EditScheduleDialog = ({ open, onClose, onSave, schedule }) => {
         days: [],
         startTime: '',
         endTime: '',
-        repeat: ''
+        repeat: '',
     });
 
     useEffect(() => {
@@ -32,14 +32,14 @@ const EditScheduleDialog = ({ open, onClose, onSave, schedule }) => {
                 days: schedule.days || [],
                 startTime: schedule.startTime || '',
                 endTime: schedule.endTime || '',
-                repeat: schedule.repeat || ''
+                repeat: schedule.repeat || '',
             });
         }
     }, [schedule]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSave = () => {
@@ -48,10 +48,12 @@ const EditScheduleDialog = ({ open, onClose, onSave, schedule }) => {
     };
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Chỉnh sửa lịch học</DialogTitle>
-            <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                <TextField label="Tên lịch học" name="title" value={form.title} onChange={handleChange} fullWidth />
+            <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                <FormControl fullWidth>
+                    <TextField label="Tên lịch học" name="title" value={form.title} onChange={handleChange} fullWidth />
+                </FormControl>
 
                 <FormControl fullWidth>
                     <InputLabel>Chọn thứ</InputLabel>
@@ -62,7 +64,7 @@ const EditScheduleDialog = ({ open, onClose, onSave, schedule }) => {
                         onChange={handleChange}
                         renderValue={(selected) => selected.join(', ')}
                     >
-                        {weekdays.map(day => (
+                        {weekdays.map((day) => (
                             <MenuItem key={day} value={day}>
                                 <Checkbox checked={form.days.includes(day)} />
                                 <ListItemText primary={day} />
@@ -71,14 +73,42 @@ const EditScheduleDialog = ({ open, onClose, onSave, schedule }) => {
                     </Select>
                 </FormControl>
 
-                <TextField label="Giờ bắt đầu" name="startTime" type="time" value={form.startTime} onChange={handleChange} fullWidth />
-                <TextField label="Giờ kết thúc" name="endTime" type="time" value={form.endTime} onChange={handleChange} fullWidth />
-                <TextField label="Lặp lại" name="repeat" value={form.repeat} onChange={handleChange} fullWidth />
+                <TextField
+                    label="Giờ bắt đầu"
+                    name="startTime"
+                    type="time"
+                    value={form.startTime}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    label="Giờ kết thúc"
+                    name="endTime"
+                    type="time"
+                    value={form.endTime}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    select
+                    label="Lặp lại"
+                    fullWidth
+                    name="repeat"
+                    value={form.repeat}
+                    onChange={handleChange}
+                    margin="normal"
+                >
+                    <MenuItem value="weekly">Hàng tuần</MenuItem>
+                    <MenuItem value="daily">Hàng ngày</MenuItem>
+                    <MenuItem value="once">Một lần</MenuItem>
+                </TextField>
             </DialogContent>
 
             <DialogActions>
                 <Button onClick={onClose}>Hủy</Button>
-                <Button variant="contained" onClick={handleSave}>Lưu</Button>
+                <Button variant="contained" onClick={handleSave}>
+                    Lưu
+                </Button>
             </DialogActions>
         </Dialog>
     );

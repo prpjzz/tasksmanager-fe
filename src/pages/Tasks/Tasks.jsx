@@ -81,8 +81,8 @@ const Task = () => {
     };
 
     const handleEditTask = async (task) => {
-        // Logic to edit task
-        console.log('Edit task:', task);
+        setResponse({});
+        setSnackbarOpen(false);
 
         updateTask.mutate(task, {
             onSuccess: () => {
@@ -90,19 +90,22 @@ const Task = () => {
                     status: 'success',
                     message: `Đã cập nhật task "${task.task_name}"`,
                 });
+                setSnackbarOpen(true);
             },
             onError: (error) => {
                 setResponse({
                     status: 'error',
                     message: `Lỗi khi cập nhật task "${task.task_name}"`,
                 });
+                setSnackbarOpen(true);
             },
         });
-
-        setSnackbarOpen(true);
     };
 
     const handleDeleteTask = async (task) => {
+        setResponse({});
+        setSnackbarOpen(false);
+
         if (task.maintask_id) {
             // Nếu là subtask thì tìm maintask chứa subtask cần xóa
             const mainTask = tasks.find((t) => t._id === task.maintask_id);
@@ -122,12 +125,14 @@ const Task = () => {
                                 status: 'success',
                                 message: `Đã xóa subtask "${task.task_name}"`,
                             });
+                            setSnackbarOpen(true);
                         },
                         onError: (error) => {
                             setResponse({
                                 status: 'error',
                                 message: `Lỗi khi xoá subtask "${task.task_name}"`,
                             });
+                            setSnackbarOpen(true);
                         },
                     },
                 );
@@ -140,17 +145,17 @@ const Task = () => {
                         status: 'success',
                         message: `Đã xoá task "${task.task_name}"`,
                     });
+                    setSnackbarOpen(true);
                 },
                 onError: (error) => {
                     setResponse({
                         status: 'error',
                         message: `Lỗi khi xoá task "${task.task_name}"`,
                     });
+                    setSnackbarOpen(true);
                 },
             });
         }
-
-        setSnackbarOpen(true);
     };
 
     return (

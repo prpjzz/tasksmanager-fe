@@ -12,6 +12,7 @@ import {
     Box,
 } from '@mui/material';
 import SnackbarAlert from '../../components/SnackbarAlert';
+import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
 import { useCreateSchedule } from '../../hooks/schedules';
 
@@ -28,6 +29,8 @@ const weekdays = [
 const AddSchedule = () => {
     const { user } = useAuth();
     const createSchedule = useCreateSchedule();
+
+    const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
     const [selectedDays, setSelectedDays] = useState([]);
     const [startTime, setStartTime] = useState('');
@@ -47,6 +50,15 @@ const AddSchedule = () => {
             return;
         }
 
+        if (startTime >= endTime) {
+            alert('Giờ kết thúc phải sau giờ bắt đầu');
+            return;
+        }
+
+        setResponse({});
+        setSnackbarOpen(false);
+        setLoading(true);
+
         const newSchedule = {
             title,
             userid: user._id,
@@ -55,7 +67,7 @@ const AddSchedule = () => {
             endTime,
             repeat,
         };
-        console.log('New Schedule:', newSchedule);
+
         createSchedule.mutate(newSchedule, {
             onSuccess: () => {
                 setResponse({
@@ -68,6 +80,7 @@ const AddSchedule = () => {
                 setStartTime('');
                 setEndTime('');
                 setRepeat('weekly');
+                setLoading(false);
             },
             onError: (error) => {
                 setResponse({
@@ -75,6 +88,7 @@ const AddSchedule = () => {
                     message: 'Có lỗi xảy ra: ' + error.message,
                 });
                 setSnackbarOpen(true);
+                setLoading(false);
             },
         });
     };
@@ -157,9 +171,12 @@ const AddSchedule = () => {
                 </Button>
             </Box>
 
-            {response.message && (
-                <SnackbarAlert open={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
+            {snackbarOpen && (
+                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
             )}
+
+            {/* Loading indicator */}
+            {loading && <LoadingDialog open={loading} />}
         </Container>
     );
 };

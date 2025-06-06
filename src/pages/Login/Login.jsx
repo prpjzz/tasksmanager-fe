@@ -233,7 +233,7 @@ export default function SignIn() {
                             color="primary"
                             sx={{ flexGrow: 1, mr: 1 }}
                             onClick={() => {
-                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+                                window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
                             }}
                         >
                             Login with Google
@@ -243,7 +243,7 @@ export default function SignIn() {
                             color="primary"
                             sx={{ flexGrow: 1, ml: 1 }}
                             onClick={() => {
-                                window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`;
+                                window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/facebook`;
                             }}
                         >
                             Login with Facebook

@@ -1,5 +1,18 @@
 import * as React from 'react';
-import { Box, Typography, Card, CardContent, Avatar, Stack, Divider, Link, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    Avatar,
+    Stack,
+    Divider,
+    Link,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+} from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import GroupIcon from '@mui/icons-material/Group';
@@ -11,13 +24,13 @@ const teamMembers = [
         name: 'Phan Đình Phú',
         role: 'Frontend Developer',
         email: 'phuphandinh2004@email.com',
-        avatar: '',
+        avatar: 'https://avatars.githubusercontent.com/u/127222540?v=4',
     },
     {
-        name: 'Trần Thị B',
+        name: 'Nguyễn Hữu Phước',
         role: 'Backend Developer',
-        email: 'tranthib@email.com',
-        avatar: '',
+        email: 'groovemusic4399@pm.me',
+        avatar: 'https://avatars.githubusercontent.com/u/89702898?v=4',
     },
     // Thêm thành viên khác nếu cần
 ];
@@ -34,7 +47,9 @@ export default function About() {
                         </Typography>
                     </Stack>
                     <Typography variant="body1" mb={2}>
-                        Ứng dụng <b>Quản lý công việc cá nhân</b> giúp bạn dễ dàng tạo, theo dõi, chỉnh sửa và hoàn thành các công việc hàng ngày. Bạn có thể phân loại công việc theo mức độ ưu tiên, trạng thái, tạo công việc con, lên lịch học, và nhận thông báo nhắc nhở.
+                        Ứng dụng <b>Quản lý công việc cá nhân</b> giúp bạn dễ dàng tạo, theo dõi, chỉnh sửa và hoàn
+                        thành các công việc hàng ngày. Bạn có thể phân loại công việc theo mức độ ưu tiên, trạng thái,
+                        tạo công việc con, lên lịch học, và nhận thông báo nhắc nhở.
                     </Typography>
                     <Divider sx={{ my: 2 }} />
                     <Stack direction="row" alignItems="center" spacing={1} mb={1}>
@@ -104,9 +119,18 @@ export default function About() {
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <GitHubIcon />
                         <Typography variant="body2">
-                            Mã nguồn:&nbsp;
+                            Mã nguồn front-end:&nbsp;
                             <Link href="https://github.com/phandinhphu/tasksmanager-fe" target="_blank" rel="noopener">
                                 github.com/phandinhphu/tasksmanager-fe
+                            </Link>
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={1} mt={1}>
+                        <GitHubIcon />
+                        <Typography variant="body2">
+                            Mã nguồn back-end:&nbsp;
+                            <Link href="https://github.com/phandinhphu/tasksmanager-be" target="_blank" rel="noopener">
+                                github.com/phandinhphu/tasksmanager-be
                             </Link>
                         </Typography>
                     </Stack>

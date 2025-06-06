@@ -1,18 +1,8 @@
-import {
-    useState,
-    useEffect,
-} from "react";
-import {
-    login,
-    logout,
-    register,
-    getCurrentUser,
-    forgotPassword,
-    resetPassword,
-} from "../../services/authServices";
-import Context from "./Context";
-import * as userServices from "../../services/userServices";
-import LoadingDialog from "../../components/LoadingDialog";
+import { useState, useEffect } from 'react';
+import { login, logout, register, getCurrentUser, forgotPassword, resetPassword } from '../../services/authServices';
+import Context from './Context';
+import * as userServices from '../../services/userServices';
+import LoadingDialog from '../../components/LoadingDialog';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -22,7 +12,7 @@ export const AuthProvider = ({ children }) => {
         const fetchUser = async () => {
             try {
                 const response = await getCurrentUser();
-                console.log("Current user:", response);    
+                console.log('Current user:', response);
                 setUser(response);
             } catch (error) {
                 if (error.response?.status === 401) {
@@ -32,7 +22,7 @@ export const AuthProvider = ({ children }) => {
                 setLoading(false);
             }
         };
-        
+
         fetchUser();
     }, []);
 
@@ -40,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await login(username, password);
         } catch (error) {
-            throw new Error("Login failed: " + error.message);
+            throw new Error('Login failed: ' + error.message);
         }
     };
 
@@ -54,13 +44,14 @@ export const AuthProvider = ({ children }) => {
             const response = await register(userData);
             return response;
         } catch (error) {
-            throw new Error("Registration failed: " + error.message);
+            console.error('Error in registration:', error.message);
+            throw new Error('Registration failed: ' + error.message);
         }
     };
 
     const handleSaveUser = (userData) => {
         setUser(userData);
-    }
+    };
 
     const handleUpdateUser = async (updatedUser) => {
         try {
@@ -68,7 +59,7 @@ export const AuthProvider = ({ children }) => {
             setUser(updatedUserData.data);
             return updatedUserData.data;
         } catch (error) {
-            throw new Error("Update failed: " + error.message);
+            throw new Error('Update failed: ' + error.message);
         }
     };
 

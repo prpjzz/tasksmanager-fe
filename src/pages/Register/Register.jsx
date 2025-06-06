@@ -73,6 +73,8 @@ export default function Register() {
             return;
         }
         event.preventDefault();
+        setGeneralErrorMessage('');
+        setSuccessMessage('');
         setLoading(true);
         const data = new FormData(event.currentTarget);
 
@@ -101,7 +103,6 @@ export default function Register() {
             setPasswordErrorMessage('');
             setConfirmPasswordError(false);
             setConfirmPasswordErrorMessage('');
-            setGeneralErrorMessage('');
         }
     };
 
