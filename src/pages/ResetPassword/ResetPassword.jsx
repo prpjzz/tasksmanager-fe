@@ -11,7 +11,6 @@ const ResetPassword = () => {
 
     const searchParams = new URLSearchParams(location.search);
     const token = searchParams.get('token');
-    console.log('Token:', token); // In ra token để kiểm tra
 
     useEffect(() => {
         if (!token) {

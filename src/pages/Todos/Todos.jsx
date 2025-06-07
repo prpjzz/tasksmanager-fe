@@ -1,6 +1,7 @@
 import { useTasks } from '../../hooks/tasks';
 import { useUpdateTaskComplete, useUpdateSubtaskComplete } from '../../hooks/tasks';
 import dayjs from '../../utils/dayjsConfig';
+import LoadingDialog from '../../components/LoadingDialog';
 import { Box, Typography, Card, CardContent, Button } from '@mui/material';
 import confetti from 'canvas-confetti';
 
@@ -8,7 +9,6 @@ const TaskCard = ({ task, onComplete }) => {
     const taskDate = dayjs(task?.extend_date || task?.end_date).tz();
     const now = dayjs().tz();
     const isOverdue = taskDate.isBefore(now);
-    const isSoon = taskDate.diff(now, 'day') <= 3 && !isOverdue;
 
     return (
         <Card
@@ -136,28 +136,36 @@ const TodosPage = () => {
     );
 
     return (
-        <Box p={3}>
-            <Typography variant="h4" gutterBottom>
-                Việc cần làm
-            </Typography>
-            {isLoading ? (
-                <Typography>Đang tải công việc...</Typography>
-            ) : (
-                <Box
-                    display="grid"
-                    gridTemplateColumns={{
-                        xs: '1fr',
-                        sm: 'repeat(2, 1fr)',
-                        md: 'repeat(3, 1fr)',
-                    }}
-                    gap={2}
-                >
-                    <TaskSection title="Hôm nay" tasks={todayTasks} onComplete={handleComplete} />
-                    <TaskSection title="Sắp đến hạn (3 ngày tới)" tasks={upcomingTasks} onComplete={handleComplete} />
-                    <TaskSection title="Quá hạn" tasks={overdueTasks} onComplete={handleComplete} />
-                </Box>
-            )}
-        </Box>
+        <>
+            <LoadingDialog open={updateTaskComplete.isPending || updateSubtaskComplete.isPending} />
+
+            <Box p={3}>
+                <Typography variant="h4" gutterBottom>
+                    Việc cần làm
+                </Typography>
+                {isLoading ? (
+                    <Typography>Đang tải công việc...</Typography>
+                ) : (
+                    <Box
+                        display="grid"
+                        gridTemplateColumns={{
+                            xs: '1fr',
+                            sm: 'repeat(2, 1fr)',
+                            md: 'repeat(3, 1fr)',
+                        }}
+                        gap={2}
+                    >
+                        <TaskSection title="Hôm nay" tasks={todayTasks} onComplete={handleComplete} />
+                        <TaskSection
+                            title="Sắp đến hạn (3 ngày tới)"
+                            tasks={upcomingTasks}
+                            onComplete={handleComplete}
+                        />
+                        <TaskSection title="Quá hạn" tasks={overdueTasks} onComplete={handleComplete} />
+                    </Box>
+                )}
+            </Box>
+        </>
     );
 };
 

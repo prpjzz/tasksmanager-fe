@@ -218,7 +218,6 @@ const Home = () => {
                             return; // Ignore schedule events
                         }
                         // Handle event click here
-                        console.log('Clicked event:', info);
                         handleViewDetails(info);
                     }}
                     eventResize={(info) => {

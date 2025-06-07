@@ -16,6 +16,7 @@ import SnackbarAlert from '../../components/SnackbarAlert';
 import DateTimeOrTimeRangePicker from '../../components/DateTimeOrTimeRangePicker';
 import Selection from '../../components/Form/Selection';
 import ListTasks from '../../components/ListTasks';
+import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
 import { useStatusPriority } from '../../hooks/status-priority';
 import { useTasks, useUpdateTask, useCreateTask } from '../../hooks/tasks';
@@ -73,7 +74,6 @@ const AddTask = () => {
     const menuitems = useMemo(() => mainTasks.map((task) => ({ value: task._id, label: task.task_name })), [mainTasks]);
 
     const handleTaskTypeChange = (e) => {
-        console.log(e.target.value);
         setTaskType(e.target.value);
 
         if (e.target.value === 'main') {
@@ -116,7 +116,6 @@ const AddTask = () => {
             const mainTask = mainTasks.find((task) => task._id === event.target.value);
             if (!mainTask) return;
             setMainTask(mainTask);
-            console.log(mainTask);
 
             const selectedTask = mainTasks.find((task) => task._id === event.target.value);
             setDateTimeRange((prev) => {
@@ -158,7 +157,6 @@ const AddTask = () => {
         if (mainTask !== null) {
             const selectedMainTask = mainTasks.find((task) => task._id === mainTask._id);
             if (!selectedMainTask) return;
-            console.log('selectedMainTask: ', selectedMainTask);
             const taskData = {
                 ...selectedMainTask,
                 subtasks: [
@@ -259,118 +257,126 @@ const AddTask = () => {
     };
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 5 }}>
-            <Box sx={{ flex: 1, maxWidth: 600 }}>
-                <Typography variant="h4" mb={3}>
-                    Thêm Task mới
-                </Typography>
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        label="Tên Task"
-                        name="taskName"
-                        value={taskName}
-                        onChange={(e) => setTaskName(e.target.value)}
-                        fullWidth
-                        required
-                        margin="normal"
-                    />
+        <>
+            <LoadingDialog open={createTask.isPending || updateTask.isPending} />
 
-                    <TextField
-                        label="Mô tả"
-                        name="description"
-                        value={taskDescription}
-                        onChange={(e) => setTaskDescription(e.target.value)}
-                        fullWidth
-                        multiline
-                        rows={4}
-                        margin="normal"
-                    />
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 5 }}>
+                <Box sx={{ flex: 1, maxWidth: 600 }}>
+                    <Typography variant="h4" mb={3}>
+                        Thêm Task mới
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            label="Tên Task"
+                            name="taskName"
+                            value={taskName}
+                            onChange={(e) => setTaskName(e.target.value)}
+                            fullWidth
+                            required
+                            margin="normal"
+                        />
 
-                    <Selection
-                        title="Trạng thái"
-                        name="status"
-                        value={status}
-                        onChange={handleStatusChange}
-                        menuitems={useMemo(
-                            () => [...statusTask.map((s) => ({ value: s._id, label: capitalize(s.name) }))],
-                            [statusTask],
-                        )}
-                    />
+                        <TextField
+                            label="Mô tả"
+                            name="description"
+                            value={taskDescription}
+                            onChange={(e) => setTaskDescription(e.target.value)}
+                            fullWidth
+                            multiline
+                            rows={4}
+                            margin="normal"
+                        />
 
-                    <Selection
-                        title="Độ ưu tiên"
-                        name="priority"
-                        value={priority}
-                        onChange={handlePriorityChange}
-                        menuitems={useMemo(
-                            () => [...priorityTask.map((p) => ({ value: p._id, label: capitalize(p.name) }))],
-                            [priorityTask],
-                        )}
-                    />
-
-                    {mainTasks && mainTasks.length > 0 ? (
-                        <FormControl component="fieldset">
-                            <FormLabel component="legend">Chọn loại task</FormLabel>
-                            <RadioGroup
-                                row
-                                aria-label="taskType"
-                                name="taskType"
-                                value={taskType}
-                                onChange={handleTaskTypeChange}
-                            >
-                                <FormControlLabel value="main" control={<Radio />} label="Task chính" />
-                                <FormControlLabel value="sub" control={<Radio />} label="Task phụ" />
-                            </RadioGroup>
-                        </FormControl>
-                    ) : (
-                        <FormLabel component="legend">Loại task: Main task</FormLabel>
-                    )}
-
-                    {taskType === 'sub' && (
                         <Selection
-                            title="Chọn task chính"
-                            name="mainTask"
-                            value={mainTask?._id || ''}
-                            onChange={handleMainTaskChange}
-                            menuitems={menuitems}
+                            title="Trạng thái"
+                            name="status"
+                            value={status}
+                            onChange={handleStatusChange}
+                            menuitems={useMemo(
+                                () => [...statusTask.map((s) => ({ value: s._id, label: capitalize(s.name) }))],
+                                [statusTask],
+                            )}
                         />
-                    )}
 
-                    <Divider sx={{ my: 2 }} />
-
-                    <FormControl fullWidth margin="normal">
-                        <DateTimeOrTimeRangePicker
-                            value={dateTimeRange}
-                            mainTask={mainTask}
-                            onChange={handleDateTimeChange}
+                        <Selection
+                            title="Độ ưu tiên"
+                            name="priority"
+                            value={priority}
+                            onChange={handlePriorityChange}
+                            menuitems={useMemo(
+                                () => [...priorityTask.map((p) => ({ value: p._id, label: capitalize(p.name) }))],
+                                [priorityTask],
+                            )}
                         />
-                    </FormControl>
 
-                    <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-                        Thêm Task
-                    </Button>
-                </form>
+                        {mainTasks && mainTasks.length > 0 ? (
+                            <FormControl component="fieldset">
+                                <FormLabel component="legend">Chọn loại task</FormLabel>
+                                <RadioGroup
+                                    row
+                                    aria-label="taskType"
+                                    name="taskType"
+                                    value={taskType}
+                                    onChange={handleTaskTypeChange}
+                                >
+                                    <FormControlLabel value="main" control={<Radio />} label="Task chính" />
+                                    <FormControlLabel value="sub" control={<Radio />} label="Task phụ" />
+                                </RadioGroup>
+                            </FormControl>
+                        ) : (
+                            <FormLabel component="legend">Loại task: Main task</FormLabel>
+                        )}
+
+                        {taskType === 'sub' && (
+                            <Selection
+                                title="Chọn task chính"
+                                name="mainTask"
+                                value={mainTask?._id || ''}
+                                onChange={handleMainTaskChange}
+                                menuitems={menuitems}
+                            />
+                        )}
+
+                        <Divider sx={{ my: 2 }} />
+
+                        <FormControl fullWidth margin="normal">
+                            <DateTimeOrTimeRangePicker
+                                value={dateTimeRange}
+                                mainTask={mainTask}
+                                onChange={handleDateTimeChange}
+                            />
+                        </FormControl>
+
+                        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                            Thêm Task
+                        </Button>
+                    </form>
+                </Box>
+
+                <Box sx={{ flex: 1, maxWidth: 600 }}>
+                    <Typography variant="h4" mb={3}>
+                        Danh sách task
+                    </Typography>
+                    <ListTasks
+                        tasks={useMemo(
+                            () =>
+                                [...mainTasks, ...subTasks]
+                                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                                    .splice(0, 5),
+                            [mainTasks, subTasks],
+                        )}
+                    />
+                </Box>
+
+                {response && (
+                    <SnackbarAlert
+                        snackbarOpen={snackbarOpen}
+                        onClose={() => setSnackbarOpen(false)}
+                        response={response}
+                    />
+                )}
             </Box>
-
-            <Box sx={{ flex: 1, maxWidth: 600 }}>
-                <Typography variant="h4" mb={3}>
-                    Danh sách task
-                </Typography>
-                <ListTasks
-                    tasks={useMemo(
-                        () =>
-                            [...mainTasks, ...subTasks]
-                                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                                .splice(0, 5),
-                        [mainTasks, subTasks],
-                    )}
-                />
-            </Box>
-
-            {response && (
-                <SnackbarAlert snackbarOpen={snackbarOpen} onClose={() => setSnackbarOpen(false)} response={response} />
-            )}
-        </Box>
+        </>
     );
 };
 
