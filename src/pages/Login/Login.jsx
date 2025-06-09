@@ -16,6 +16,8 @@ import ForgotPassword from '../../components/ForgotPassword';
 import LoadingDialog from '../../components/LoadingDialog';
 import { useAuth } from '../../hooks/auth';
 import { getCurrentUser } from '../../services/authServices';
+import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
+
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -236,6 +238,7 @@ export default function SignIn() {
                                 window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
                             }}
                         >
+                            <FaGoogle style={{ marginRight: '8px' }} />
                             Login with Google
                         </Button>
                         <Button
@@ -246,6 +249,7 @@ export default function SignIn() {
                                 window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/facebook`;
                             }}
                         >
+                            <FaFacebook style={{ marginRight: '8px' }} />
                             Login with Facebook
                         </Button>
                     </Stack>
