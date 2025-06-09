@@ -13,6 +13,8 @@ import Alert from '@mui/material/Alert';
 import LoadingDialog from '../../components/LoadingDialog';
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../../hooks/auth';
+import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -267,6 +269,7 @@ export default function Register() {
                                 window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
                             }}
                         >
+                            <FaGoogle style={{ marginRight: '8px' }} />
                             Login with Google
                         </Button>
                         <Button
@@ -277,6 +280,7 @@ export default function Register() {
                                 window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`;
                             }}
                         >
+                            <FaFacebook style={{ marginRight: '8px' }} />
                             Login with Facebook
                         </Button>
                     </Stack>
